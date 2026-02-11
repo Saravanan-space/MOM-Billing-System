@@ -100,20 +100,21 @@
 
                 <!-- Active Items List -->
                 <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50">
-                    <!-- Cart items will fill space naturally -->
+                    <!-- Cart items -->
                 </div>
 
                 <!-- Billing Summary Section -->
                 <div class="mt-auto p-5 md:p-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-6 gap-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-5 gap-4">
                         <div class="flex flex-col">
                             <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Grand Total</span>
-                            <span class="text-5xl font-black text-amber-500 font-mono tracking-tighter leading-none" id="posGrandTotal">₹0.00</span>
+                            <!-- DECREASED FONT SIZE HERE -->
+                            <span class="text-3xl font-black text-amber-500 font-mono tracking-tighter leading-none" id="posGrandTotal">₹0.00</span>
                         </div>
                         <div class="w-full sm:w-auto text-right">
                             <div class="flex items-center gap-3 mb-2 justify-end">
                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter">Discount:</span>
-                                <input type="number" id="posDiscount" oninput="updatePosTotals()" value="0" class="w-20 bg-slate-800 border-2 border-slate-700 rounded-xl text-center text-base font-mono text-amber-400 py-2 outline-none focus:border-amber-500">
+                                <input type="number" id="posDiscount" oninput="updatePosTotals()" value="0" class="w-20 bg-slate-800 border-2 border-slate-700 rounded-xl text-center text-base font-mono text-amber-400 py-1.5 outline-none focus:border-amber-500">
                             </div>
                             <span class="text-xs font-mono opacity-50 block" id="posSubtotal">Subtotal: ₹0.00</span>
                         </div>
@@ -145,7 +146,6 @@
                     <button onclick="processCheckout()" class="w-full bg-amber-500 text-slate-900 font-black py-5 rounded-[2rem] shadow-2xl active-press transition-all text-base tracking-[0.2em] uppercase mb-4">
                         FINALIZE ORDER
                     </button>
-                    <!-- Extra spacing for bottom of phone screens -->
                     <div class="h-4 md:hidden"></div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
         <section id="view-reports" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Sales History</h1>
-                <button onclick="exportToPDF()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
+                <button onclick="exportToPDF()" class="bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
                     <i data-lucide="download" class="w-6 h-6"></i> Export PDF
                 </button>
             </div>
@@ -264,7 +264,6 @@
     </div>
 
     <script>
-        // --- DATA STATE ---
         let items = [
             { id: 1, name: 'Coconut Oil', price: 280 },
             { id: 2, name: 'Groundnut Oil', price: 190 },
@@ -295,17 +294,14 @@
             lucide.createIcons();
         };
 
-        // --- UI NAVIGATION ---
         function switchView(viewId) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
-            
             document.querySelectorAll('nav button').forEach(btn => {
                 btn.className = "p-2.5 rounded-xl text-slate-400 hover:bg-slate-800 active-press";
             });
             const activeNav = document.getElementById(`nav-${viewId}`);
             if(activeNav) activeNav.className = "p-2.5 rounded-xl bg-amber-500 text-slate-900 active-press shadow-md";
-            
             if (viewId === 'dashboard') updateDashboard();
             if (viewId === 'reports') renderReports();
             if (viewId === 'inventory') renderInventory();
@@ -313,14 +309,13 @@
             lucide.createIcons();
         }
 
-        // --- INVENTORY LOGIC ---
         function renderInventory() {
             const container = document.getElementById('inventoryContainer');
             if(!container) return;
             container.innerHTML = items.map(item => `
                 <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center group">
                     <div class="flex-1 pr-4 min-w-0">
-                        <p class="font-extrabold text-slate-800 text-base uppercase truncate mb-1 tracking-tight leading-none">${item.name}</p>
+                        <p class="font-extrabold text-slate-800 text-base uppercase truncate leading-none mb-1 tracking-tight">${item.name}</p>
                         <p class="text-xs text-slate-400 font-mono font-black tracking-widest">₹${item.price.toFixed(2)} / KG</p>
                     </div>
                     <div class="flex gap-2">
@@ -353,14 +348,12 @@
             const name = document.getElementById('modalItemName').value.trim();
             const price = parseFloat(document.getElementById('modalItemPrice').value);
             if (!name || isNaN(price)) return;
-            
             if (currentEditId) {
                 items = items.map(i => i.id === currentEditId ? {...i, name, price} : i);
                 cart = cart.map(c => c.masterId === currentEditId ? {...c, name, unitPrice: price, total: c.qty * price} : c);
             } else {
                 items.push({ id: Date.now(), name, price });
             }
-            
             localStorage.setItem('om_items', JSON.stringify(items));
             closeModal('itemModal');
             renderInventory();
@@ -378,13 +371,11 @@
             }
         }
 
-        // --- POS SYSTEM ---
         function renderPosGrid() {
             const search = document.getElementById('posSearch').value.toLowerCase();
             const grid = document.getElementById('posGrid');
             if(!grid) return;
             const filtered = items.filter(i => i.name.toLowerCase().includes(search));
-
             grid.innerHTML = filtered.map(item => `
                 <button onclick="openPosEntryModal(${item.id})" class="bg-white rounded-[2rem] border-4 border-slate-100 shadow-sm transition-all flex flex-col items-center justify-center text-center active-press aspect-square p-2 group hover:border-amber-400">
                     <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors shrink-0">
@@ -403,10 +394,8 @@
             document.getElementById('posItemPriceDisplay').innerText = `₹${currentPosItem.price.toFixed(2)} / kg`;
             document.getElementById('posValueInput').value = '';
             document.getElementById('posConversionResult').innerText = "₹0.00";
-            
             document.getElementById('posEntryModal').classList.remove('hidden');
             setTimeout(() => document.getElementById('posValueInput').focus(), 200);
-            
             document.getElementById('posValueInput').oninput = () => {
                 const val = parseFloat(document.getElementById('posValueInput').value) || 0;
                 const res = document.getElementById('posConversionResult');
@@ -419,7 +408,6 @@
             const btnKG = document.getElementById('btnModeKG');
             const btnRS = document.getElementById('btnModeRS');
             const label = document.getElementById('posModeIndicator');
-            
             btnKG.className = mode === 'kg' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
             btnRS.className = mode === 'rs' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
             label.innerText = mode === 'kg' ? "Enter Weight (KG)" : "Enter Amount (₹)";
@@ -431,7 +419,6 @@
             if (!val || !currentPosItem) return;
             const qty = posMode === 'kg' ? val : val / currentPosItem.price;
             const total = posMode === 'kg' ? val * currentPosItem.price : val;
-
             cart.push({ id: Date.now(), masterId: currentPosItem.id, name: currentPosItem.name, unitPrice: currentPosItem.price, qty, total });
             closeModal('posEntryModal');
             renderPosCart();
@@ -447,7 +434,7 @@
                 list.innerHTML = cart.map((item, idx) => `
                     <div class="bg-white p-5 rounded-[2rem] border-4 border-slate-100 flex justify-between items-center shadow-sm cart-update">
                         <div class="flex-1 min-w-0 pr-4">
-                            <p class="font-extrabold text-slate-800 text-sm truncate uppercase tracking-tight leading-none mb-1">${item.name}</p>
+                            <p class="font-extrabold text-slate-800 text-sm uppercase truncate mb-1 tracking-tight leading-none">${item.name}</p>
                             <p class="text-xs text-slate-400 font-mono font-black">${item.qty.toFixed(3)} kg × ₹${item.unitPrice}</p>
                         </div>
                         <div class="text-right flex items-center gap-3">
@@ -506,16 +493,13 @@
             const total = Math.max(0, subtotal - (parseFloat(document.getElementById('posDiscount').value) || 0));
             const received = parseFloat(document.getElementById('posReceived').value) || total;
             const change = Math.max(0, received - total);
-
             const sale = { id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total, method: paymentMethod, received, change };
             salesHistory.unshift(sale);
             localStorage.setItem('om_sales', JSON.stringify(salesHistory));
-            
             document.getElementById('receiptTotal').innerText = `₹${total.toFixed(2)}`;
             document.getElementById('receiptChange').innerText = `₹${change.toFixed(2)}`;
             document.getElementById('receiptItems').innerHTML = cart.map(i => `<div class="flex justify-between uppercase text-xs"><span>${i.name} (${i.qty.toFixed(2)}kg)</span><span>${i.total.toFixed(2)}</span></div>`).join('');
             document.getElementById('orderModal').classList.remove('hidden');
-            
             cart = [];
             document.getElementById('posDiscount').value = 0;
             document.getElementById('posReceived').value = '';
@@ -524,18 +508,16 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- ANALYTICS VIEWS ---
         function renderReports() {
             const container = document.getElementById('reportsContainer');
             if(!container) return;
             const totalRev = salesHistory.reduce((sum, s) => sum + s.total, 0);
             if(document.getElementById('reports-total')) document.getElementById('reports-total').innerText = `₹${totalRev.toLocaleString()}`;
-
             if (salesHistory.length === 0) {
                 container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="history" class="w-16 h-16 mx-auto mb-4"></i>No Sales Found</div>`;
             } else {
                 container.innerHTML = salesHistory.map(sale => `
-                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm active-press">
+                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
                         <div class="flex justify-between items-start mb-4 border-b-4 border-slate-50 pb-4">
                             <div>
                                 <p class="font-black text-slate-800 text-base font-mono tracking-tighter">#${String(sale.id).slice(-6)}</p>
@@ -547,12 +529,7 @@
                             </div>
                         </div>
                         <div class="space-y-2">
-                            ${sale.items.map(item => `
-                                <div class="flex justify-between items-center text-sm">
-                                    <span class="text-slate-600 font-bold uppercase truncate pr-4">${item.name}</span>
-                                    <span class="text-slate-400 font-mono font-black shrink-0">${item.qty.toFixed(3)} kg</span>
-                                </div>
-                            `).join('')}
+                            ${sale.items.map(item => `<div class="flex justify-between items-center text-sm"><span class="text-slate-600 font-bold uppercase truncate pr-4">${item.name}</span><span class="text-slate-400 font-mono font-black shrink-0">${item.qty.toFixed(3)} kg</span></div>`).join('')}
                         </div>
                     </div>
                 `).join('');
@@ -566,18 +543,14 @@
             const revenue = todaySales.reduce((sum, s) => sum + s.total, 0);
             if(document.getElementById('dash-revenue')) document.getElementById('dash-revenue').innerText = `₹${revenue.toLocaleString()}`;
             if(document.getElementById('dash-txns')) document.getElementById('dash-txns').innerText = todaySales.length;
-
             if (todaySales.length > 0) {
                 const productCounts = {};
                 todaySales.forEach(sale => { sale.items.forEach(item => { productCounts[item.name] = (productCounts[item.name] || 0) + item.qty; }); });
                 const topProd = Object.keys(productCounts).reduce((a, b) => productCounts[a] > productCounts[b] ? a : b);
                 if(document.getElementById('dash-top')) document.getElementById('dash-top').innerText = topProd;
             }
-
             if (salesChart) {
-                const last7Days = Array.from({length: 7}, (_, i) => {
-                    const d = new Date(); d.setDate(d.getDate() - i); return d.toLocaleDateString();
-                }).reverse();
+                const last7Days = Array.from({length: 7}, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toLocaleDateString(); }).reverse();
                 const data = last7Days.map(date => salesHistory.filter(s => s.date.includes(date)).reduce((sum, s) => sum + s.total, 0));
                 salesChart.data.labels = last7Days.map(d => d.split('/')[0] + '/' + d.split('/')[1]);
                 salesChart.data.datasets[0].data = data;
@@ -590,30 +563,21 @@
             if(!canvas) return;
             salesChart = new Chart(canvas.getContext('2d'), {
                 type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)', fill: true, tension: 0.4, borderWidth: 6, pointRadius: 0 }]
-                },
+                data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)', fill: true, tension: 0.4, borderWidth: 6, pointRadius: 0 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 12, weight: 'bold' }, color: '#94a3b8' } } } }
             });
         }
 
         function exportToPDF() {
-            if (!window.jspdf) return alert("Loading PDF Engine...");
+            if (!window.jspdf) return alert("Loading PDF...");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(22);
             doc.setTextColor(180, 83, 9);
             doc.text("SRI MAHAMUNI OIL MILLS - SALES REPORT", 105, 20, { align: "center" });
-            const tableData = salesHistory.map(s => [
-                String(s.id).slice(-6),
-                s.date,
-                s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '),
-                s.method,
-                `Rs. ${s.total.toFixed(2)}`
-            ]);
+            const tableData = salesHistory.map(s => [String(s.id).slice(-6), s.date, s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), s.method, `Rs. ${s.total.toFixed(2)}`]);
             doc.autoTable({ startY: 35, head: [['Ref', 'Date', 'Items & Weight', 'Mode', 'Total']], body: tableData, theme: 'striped', headStyles: { fillColor: [180, 83, 9] } });
-            doc.save(`Oil_Mill_Sales_${new Date().toLocaleDateString()}.pdf`);
+            doc.save(`Sales_Report.pdf`);
         }
 
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
