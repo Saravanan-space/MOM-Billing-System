@@ -93,8 +93,6 @@
                     </span>
                     <button onclick="clearCart()" class="text-xs font-black text-red-500 border-2 border-red-100 px-4 py-2 rounded-xl bg-white active-press uppercase tracking-wider">RESET</button>
                 </div>
-
-                <!-- Active Items List -->
                 <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50"></div>
 
                 <!-- COMPACT BILLING SUMMARY SECTION -->
@@ -113,17 +111,15 @@
                         </div>
                     </div>
 
-                    <!-- Payment Mode Toggles -->
                     <div class="flex gap-3 mb-4">
                         <button onclick="setPosPayment('Cash')" id="posPayCash" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-[10px] active-press transition-all shadow-lg uppercase tracking-widest">
                             <i data-lucide="banknote" class="w-4 h-4"></i> CASH
                         </button>
-                        <button onclick="setPosPayment('UPI')" id="posPayUPI" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest">
+                        <button onclick="setPosPayment('UPI')" id="nav-upi" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest">
                             <i data-lucide="qr-code" class="w-4 h-4"></i> UPI
                         </button>
                     </div>
 
-                    <!-- Money Register -->
                     <div class="grid grid-cols-2 gap-3 mb-5">
                         <div class="bg-slate-800/80 rounded-xl p-3 flex flex-col border-2 border-white/5">
                             <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Received</span>
@@ -148,24 +144,29 @@
             <h1 class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Stats Center</h1>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Revenue</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Revenue Today</p>
                     <h3 class="text-3xl font-black text-slate-800 font-mono" id="dash-revenue">₹0.00</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Sales</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Transactions Today</p>
                     <h3 class="text-3xl font-black text-slate-800 font-mono" id="dash-txns">0</h3>
                 </div>
                 <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Top Oil Type</p>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Daily Peak Product</p>
                     <h3 class="text-xl font-black text-amber-600 uppercase truncate" id="dash-top">---</h3>
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-[2.5rem] border-4 border-slate-100 shadow-sm h-80">
-                <canvas id="salesChart"></canvas>
+            
+            <!-- NEW PIE CHART SECTION -->
+            <div class="bg-white p-6 rounded-[2.5rem] border-4 border-slate-100 shadow-sm flex flex-col items-center">
+                <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 text-center">Oil Sales Distribution (Today's KG %)</h2>
+                <div class="w-full max-w-[350px] aspect-square flex items-center justify-center">
+                    <canvas id="salesPieChart"></canvas>
+                </div>
             </div>
         </section>
 
-        <!-- INVENTORY MASTER -->
+        <!-- INVENTORY VIEW -->
         <section id="view-inventory" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Inventory Master</h1>
@@ -222,7 +223,7 @@
         @Sri Mahamuni Oil mills
     </footer>
 
-    <!-- MODALS (PRODUCT ENTRY, ITEM MASTER, SUCCESS) -->
+    <!-- MODALS -->
     <div id="posEntryModal" class="hidden fixed inset-0 z-[100] flex items-start justify-center bg-slate-900/80 backdrop-blur-md p-4 pt-16 md:items-center">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in slide-in-from-top-10 duration-300">
             <div class="bg-slate-900 p-6 text-white border-b-8 border-amber-500/20">
@@ -299,8 +300,8 @@
         let paymentMethod = 'Cash';
         let currentPosItem = null;
         let posMode = 'kg';
-        let salesChart = null;
         let currentEditId = null;
+        let pieChartInstance = null;
 
         window.onload = () => {
             const storedItems = localStorage.getItem('om_items');
@@ -312,7 +313,7 @@
             renderInventory();
             renderReports();
             updateDashboard();
-            initChart();
+            initPieChart();
             lucide.createIcons();
         };
 
@@ -333,7 +334,6 @@
             lucide.createIcons();
         }
 
-        // --- INVENTORY ---
         function renderInventory() {
             const container = document.getElementById('inventoryContainer');
             if(!container) return;
@@ -396,7 +396,6 @@
             }
         }
 
-        // --- POS ---
         function renderPosGrid() {
             const search = document.getElementById('posSearch').value.toLowerCase();
             const grid = document.getElementById('posGrid');
@@ -492,12 +491,13 @@
         function setPosPayment(method) {
             paymentMethod = method;
             const cash = document.getElementById('posPayCash');
-            const upi = document.getElementById('posPayUPI');
+            const upi = document.getElementById('nav-upi');
+            // Using ID check to prevent breaking previous design
             if (method === 'Cash') {
                 cash.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest";
-                upi.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-xs active-press transition-all uppercase tracking-widest";
+                if(upi) upi.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-xs active-press transition-all uppercase tracking-widest";
             } else {
-                upi.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest";
+                if(upi) upi.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest";
                 cash.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-xs active-press transition-all uppercase tracking-widest";
             }
         }
@@ -519,7 +519,6 @@
             const total = Math.max(0, subtotal - (parseFloat(document.getElementById('posDiscount').value) || 0));
             const received = parseFloat(document.getElementById('posReceived').value) || total;
             const change = Math.max(0, received - total);
-
             const sale = { id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total, method: paymentMethod, received, change };
             salesHistory.unshift(sale);
             localStorage.setItem('om_sales', JSON.stringify(salesHistory));
@@ -533,6 +532,73 @@
             renderPosCart();
             updatePosTotals();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- DASHBOARD & PIE CHART ---
+        function updateDashboard() {
+            const today = new Date().toLocaleDateString();
+            const todaySales = salesHistory.filter(s => s.date.includes(today));
+            const revenue = todaySales.reduce((sum, s) => sum + s.total, 0);
+            
+            document.getElementById('dash-revenue').innerText = `₹${revenue.toLocaleString()}`;
+            document.getElementById('dash-txns').innerText = todaySales.length;
+
+            const oilTotals = {};
+            todaySales.forEach(sale => {
+                sale.items.forEach(item => {
+                    oilTotals[item.name] = (oilTotals[item.name] || 0) + item.qty;
+                });
+            });
+
+            if (todaySales.length > 0) {
+                const topProd = Object.keys(oilTotals).reduce((a, b) => oilTotals[a] > oilTotals[b] ? a : b);
+                document.getElementById('dash-top').innerText = topProd;
+            }
+
+            if (pieChartInstance) {
+                pieChartInstance.data.labels = Object.keys(oilTotals);
+                pieChartInstance.data.datasets[0].data = Object.values(oilTotals);
+                pieChartInstance.update();
+            }
+        }
+
+        function initPieChart() {
+            const canvas = document.getElementById('salesPieChart');
+            if(!canvas) return;
+            
+            pieChartInstance = new Chart(canvas.getContext('2d'), {
+                type: 'pie',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: [
+                            '#f59e0b', // Amber
+                            '#0f172a', // Slate
+                            '#3b82f6', // Blue
+                            '#10b981', // Green
+                            '#ef4444', // Red
+                            '#8b5cf6', // Violet
+                            '#f43f5e'  // Rose
+                        ],
+                        borderWidth: 4,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 11, weight: 'bold' },
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function renderReports() {
@@ -561,8 +627,8 @@
                     <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
                         <div class="flex justify-between items-start mb-4 border-b-4 border-slate-50 pb-4">
                             <div>
-                                <p class="font-black text-slate-800 text-base font-mono tracking-tighter">#${String(sale.id).slice(-6)}</p>
-                                <p class="text-xs text-slate-400 font-bold uppercase mt-1">${sale.date}</p>
+                                <p class="font-black text-slate-800 text-sm leading-tight uppercase tracking-tight">${sale.date}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ref ID: #${String(sale.id).slice(-6)}</p>
                             </div>
                             <div class="text-right">
                                 <p class="font-black text-slate-900 font-mono text-xl leading-none">₹${sale.total.toFixed(2)}</p>
@@ -585,37 +651,6 @@
             renderReports();
         }
 
-        function updateDashboard() {
-            const today = new Date().toLocaleDateString();
-            const todaySales = salesHistory.filter(s => s.date.includes(today));
-            const revenue = todaySales.reduce((sum, s) => sum + s.total, 0);
-            if(document.getElementById('dash-revenue')) document.getElementById('dash-revenue').innerText = `₹${revenue.toLocaleString()}`;
-            if(document.getElementById('dash-txns')) document.getElementById('dash-txns').innerText = todaySales.length;
-            if (todaySales.length > 0) {
-                const productCounts = {};
-                todaySales.forEach(sale => { sale.items.forEach(item => { productCounts[item.name] = (productCounts[item.name] || 0) + item.qty; }); });
-                const topProd = Object.keys(productCounts).reduce((a, b) => productCounts[a] > productCounts[b] ? a : b);
-                if(document.getElementById('dash-top')) document.getElementById('dash-top').innerText = topProd;
-            }
-            if (salesChart) {
-                const last7Days = Array.from({length: 7}, (_, i) => { const d = new Date(); d.setDate(d.getDate() - i); return d.toLocaleDateString(); }).reverse();
-                const data = last7Days.map(date => salesHistory.filter(s => s.date.includes(date)).reduce((sum, s) => sum + s.total, 0));
-                salesChart.data.labels = last7Days.map(d => d.split('/')[0] + '/' + d.split('/')[1]);
-                salesChart.data.datasets[0].data = data;
-                salesChart.update();
-            }
-        }
-
-        function initChart() {
-            const canvas = document.getElementById('salesChart');
-            if(!canvas) return;
-            salesChart = new Chart(canvas.getContext('2d'), {
-                type: 'line',
-                data: { labels: [], datasets: [{ data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.05)', fill: true, tension: 0.4, borderWidth: 6, pointRadius: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false }, ticks: { font: { size: 12, weight: 'bold' }, color: '#94a3b8' } } } }
-            });
-        }
-
         function exportToPDF() {
             if (!window.jspdf) return alert("Loading PDF...");
             const { jsPDF } = window.jspdf;
@@ -623,8 +658,8 @@
             doc.setFontSize(22);
             doc.setTextColor(180, 83, 9);
             doc.text("SRI MAHAMUNI OIL MILLS - SALES REPORT", 105, 20, { align: "center" });
-            const tableData = salesHistory.map(s => [String(s.id).slice(-6), s.date, s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), s.method, `Rs. ${s.total.toFixed(2)}`]);
-            doc.autoTable({ startY: 35, head: [['Ref', 'Date', 'Items & Weight', 'Mode', 'Total']], body: tableData, theme: 'striped', headStyles: { fillColor: [180, 83, 9] } });
+            const tableData = salesHistory.map(s => [s.date, `ID: #${String(s.id).slice(-6)}`, s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), s.method, `Rs. ${s.total.toFixed(2)}`]);
+            doc.autoTable({ startY: 35, head: [['Date', 'Ref ID', 'Items & Weight', 'Mode', 'Total']], body: tableData, theme: 'striped', headStyles: { fillColor: [180, 83, 9] } });
             doc.save(`Sales_Report.pdf`);
         }
 
