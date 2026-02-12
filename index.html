@@ -74,22 +74,18 @@
     <!-- MAIN CONTENT -->
     <main class="flex-1 overflow-hidden">
         
-        <!-- POS VIEW (Single long scrollable page for mobile) -->
+        <!-- POS VIEW -->
         <section id="view-pos" class="h-full overflow-y-auto custom-scrollbar flex flex-col md:flex-row bg-slate-50">
-            
-            <!-- PRODUCT SELECTION (Part of the main scroll) -->
+            <!-- PRODUCT SELECTION -->
             <div class="w-full md:flex-[1.2] flex flex-col p-3 md:p-6 md:border-r-4 border-slate-200 shrink-0 md:h-full md:overflow-y-auto custom-scrollbar">
                 <div class="relative mb-4">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
                     <input type="text" id="posSearch" placeholder="Search product..." oninput="renderPosGrid()" class="w-full pl-11 pr-4 py-3.5 bg-white border-4 border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none text-base font-bold transition-all shadow-sm">
                 </div>
-                
-                <div id="posGrid" class="pos-grid pb-6">
-                    <!-- Square tiles -->
-                </div>
+                <div id="posGrid" class="pos-grid pb-6"></div>
             </div>
 
-            <!-- CART & TOTALS SECTION (Appears below grid on mobile) -->
+            <!-- CART SECTION -->
             <div class="w-full flex-1 flex flex-col bg-white shrink-0 md:h-full md:overflow-y-auto custom-scrollbar border-t-4 md:border-t-0 border-slate-200">
                 <div class="px-5 py-4 border-b-4 border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10">
                     <span class="font-extrabold text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
@@ -97,18 +93,12 @@
                     </span>
                     <button onclick="clearCart()" class="text-xs font-black text-red-500 border-2 border-red-100 px-4 py-2 rounded-xl bg-white active-press uppercase tracking-wider">RESET</button>
                 </div>
+                <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50"></div>
 
-                <!-- Active Items List -->
-                <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50">
-                    <!-- Cart items -->
-                </div>
-
-                <!-- Billing Summary Section -->
                 <div class="mt-auto p-5 md:p-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-5 gap-4">
                         <div class="flex flex-col">
                             <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Grand Total</span>
-                            <!-- DECREASED FONT SIZE HERE -->
                             <span class="text-3xl font-black text-amber-500 font-mono tracking-tighter leading-none" id="posGrandTotal">₹0.00</span>
                         </div>
                         <div class="w-full sm:w-auto text-right">
@@ -120,7 +110,6 @@
                         </div>
                     </div>
 
-                    <!-- Payment Mode Toggles -->
                     <div class="flex gap-4 mb-5">
                         <button onclick="setPosPayment('Cash')" id="posPayCash" class="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest">
                             <i data-lucide="banknote" class="w-6 h-6"></i> CASH
@@ -130,7 +119,6 @@
                         </button>
                     </div>
 
-                    <!-- Money Register -->
                     <div class="grid grid-cols-2 gap-4 mb-6">
                         <div class="bg-slate-800/80 rounded-2xl p-4 flex flex-col border-2 border-white/5">
                             <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Received</span>
@@ -142,11 +130,9 @@
                         </div>
                     </div>
 
-                    <!-- FINAL BUTTON -->
                     <button onclick="processCheckout()" class="w-full bg-amber-500 text-slate-900 font-black py-5 rounded-[2rem] shadow-2xl active-press transition-all text-base tracking-[0.2em] uppercase mb-4">
                         FINALIZE ORDER
                     </button>
-                    <div class="h-4 md:hidden"></div>
                 </div>
             </div>
         </section>
@@ -173,7 +159,7 @@
             </div>
         </section>
 
-        <!-- INVENTORY MASTER -->
+        <!-- INVENTORY VIEW -->
         <section id="view-inventory" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Inventory</h1>
@@ -188,15 +174,45 @@
         <section id="view-reports" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Sales History</h1>
-                <button onclick="exportToPDF()" class="bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
+                <button onclick="exportToPDF()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
                     <i data-lucide="download" class="w-6 h-6"></i> Export PDF
                 </button>
             </div>
+
+            <!-- UPDATED FILTERS SECTION WITH START AND END DATE -->
+            <div class="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-sm mb-6 space-y-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Advanced Filtering</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Start Date</label>
+                        <input type="date" id="filterStartDate" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">End Date</label>
+                        <input type="date" id="filterEndDate" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Payment Method</label>
+                        <select id="filterMethod" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
+                            <option value="All">All Methods</option>
+                            <option value="Cash">Cash Only</option>
+                            <option value="UPI">UPI Only</option>
+                        </select>
+                    </div>
+                </div>
+                <button onclick="clearFilters()" class="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest py-2 hover:text-red-500 transition-colors">Clear All Filters</button>
+            </div>
+
+            <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-100 mb-4 flex justify-between items-center shadow-sm">
+                <span class="text-xs font-black text-amber-700 uppercase tracking-widest">Filtered Result Total:</span>
+                <span class="text-2xl font-black text-amber-800 font-mono" id="reports-total">₹0.00</span>
+            </div>
+
             <div id="reportsContainer" class="space-y-4 pb-28"></div>
         </section>
     </main>
 
-    <!-- MODAL: PRODUCT ENTRY -->
+    <!-- MODALS -->
     <div id="posEntryModal" class="hidden fixed inset-0 z-[100] flex items-start justify-center bg-slate-900/80 backdrop-blur-md p-4 pt-16 md:items-center">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in slide-in-from-top-10 duration-300">
             <div class="bg-slate-900 p-6 text-white border-b-8 border-amber-500/20">
@@ -212,24 +228,20 @@
                     <p id="posModeIndicator" class="text-center text-amber-500/50 font-black uppercase tracking-[0.3em] text-[10px] mt-4">Enter Weight (KG)</p>
                 </div>
             </div>
-
             <div class="p-8 space-y-6">
                 <div class="flex p-2 bg-slate-100 rounded-2xl">
                     <button onclick="togglePosMode('kg')" id="btnModeKG" class="flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900">BY WEIGHT</button>
                     <button onclick="togglePosMode('rs')" id="btnModeRS" class="flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400">BY AMOUNT</button>
                 </div>
-
                 <div class="bg-amber-50 rounded-2xl p-6 flex flex-col items-center border-4 border-amber-100">
                     <p class="text-xs font-black text-amber-700 uppercase tracking-widest mb-1">Calculated Total</p>
                     <p id="posConversionResult" class="text-4xl font-black text-amber-600 font-mono tracking-tighter">₹0.00</p>
                 </div>
-
-                <button onclick="addItemToCartFromModal()" class="w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] active-press uppercase text-base tracking-[0.1em] shadow-2xl shadow-slate-900/30">ADD TO BILL</button>
+                <button onclick="addItemToCartFromModal()" class="w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] active-press uppercase text-base tracking-[0.1em] shadow-2xl">ADD TO BILL</button>
             </div>
         </div>
     </div>
 
-    <!-- ITEM MASTER MODAL -->
     <div id="itemModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
             <div class="p-6 border-b-4 border-slate-50 flex justify-between items-center">
@@ -244,7 +256,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL -->
     <div id="orderModal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
         <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm overflow-hidden p-8 flex flex-col items-center animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-inner"><i data-lucide="check" class="w-10 h-10"></i></div>
@@ -264,6 +275,7 @@
     </div>
 
     <script>
+        // --- DATA & STATE ---
         let items = [
             { id: 1, name: 'Coconut Oil', price: 280 },
             { id: 2, name: 'Groundnut Oil', price: 190 },
@@ -302,6 +314,7 @@
             });
             const activeNav = document.getElementById(`nav-${viewId}`);
             if(activeNav) activeNav.className = "p-2.5 rounded-xl bg-amber-500 text-slate-900 active-press shadow-md";
+            
             if (viewId === 'dashboard') updateDashboard();
             if (viewId === 'reports') renderReports();
             if (viewId === 'inventory') renderInventory();
@@ -309,6 +322,7 @@
             lucide.createIcons();
         }
 
+        // --- INVENTORY ---
         function renderInventory() {
             const container = document.getElementById('inventoryContainer');
             if(!container) return;
@@ -363,7 +377,7 @@
         }
 
         function deleteItem(id) {
-            if (confirm('Permanently delete this product?')) {
+            if (confirm('Delete this product?')) {
                 items = items.filter(i => i.id !== id);
                 localStorage.setItem('om_items', JSON.stringify(items));
                 renderInventory();
@@ -371,6 +385,7 @@
             }
         }
 
+        // --- POS ---
         function renderPosGrid() {
             const search = document.getElementById('posSearch').value.toLowerCase();
             const grid = document.getElementById('posGrid');
@@ -434,7 +449,7 @@
                 list.innerHTML = cart.map((item, idx) => `
                     <div class="bg-white p-5 rounded-[2rem] border-4 border-slate-100 flex justify-between items-center shadow-sm cart-update">
                         <div class="flex-1 min-w-0 pr-4">
-                            <p class="font-extrabold text-slate-800 text-sm uppercase truncate mb-1 tracking-tight leading-none">${item.name}</p>
+                            <p class="font-extrabold text-slate-800 text-sm truncate uppercase tracking-tight leading-none mb-1">${item.name}</p>
                             <p class="text-xs text-slate-400 font-mono font-black">${item.qty.toFixed(3)} kg × ₹${item.unitPrice}</p>
                         </div>
                         <div class="text-right flex items-center gap-3">
@@ -493,6 +508,7 @@
             const total = Math.max(0, subtotal - (parseFloat(document.getElementById('posDiscount').value) || 0));
             const received = parseFloat(document.getElementById('posReceived').value) || total;
             const change = Math.max(0, received - total);
+
             const sale = { id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total, method: paymentMethod, received, change };
             salesHistory.unshift(sale);
             localStorage.setItem('om_sales', JSON.stringify(salesHistory));
@@ -508,16 +524,43 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        // --- UPDATED REPORTS & RANGE FILTER LOGIC ---
         function renderReports() {
             const container = document.getElementById('reportsContainer');
             if(!container) return;
-            const totalRev = salesHistory.reduce((sum, s) => sum + s.total, 0);
-            if(document.getElementById('reports-total')) document.getElementById('reports-total').innerText = `₹${totalRev.toLocaleString()}`;
-            if (salesHistory.length === 0) {
-                container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="history" class="w-16 h-16 mx-auto mb-4"></i>No Sales Found</div>`;
+
+            const startStr = document.getElementById('filterStartDate').value;
+            const endStr = document.getElementById('filterEndDate').value;
+            const methodFilter = document.getElementById('filterMethod').value;
+
+            // Prepare comparison objects
+            let startDate = startStr ? new Date(startStr) : null;
+            if(startDate) startDate.setHours(0, 0, 0, 0);
+
+            let endDate = endStr ? new Date(endStr) : null;
+            if(endDate) endDate.setHours(23, 59, 59, 999); // Include entire end day
+
+            const filteredHistory = salesHistory.filter(sale => {
+                const saleDateObj = new Date(sale.id);
+
+                // Date Range Check
+                if (startDate && saleDateObj < startDate) return false;
+                if (endDate && saleDateObj > endDate) return false;
+
+                // Payment Method Check
+                if (methodFilter !== 'All' && sale.method !== methodFilter) return false;
+
+                return true;
+            });
+
+            const filteredTotal = filteredHistory.reduce((sum, s) => sum + s.total, 0);
+            document.getElementById('reports-total').innerText = `₹${filteredTotal.toLocaleString()}`;
+
+            if (filteredHistory.length === 0) {
+                container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4"></i>No matches found</div>`;
             } else {
-                container.innerHTML = salesHistory.map(sale => `
-                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
+                container.innerHTML = filteredHistory.map(sale => `
+                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm active-press transition-all">
                         <div class="flex justify-between items-start mb-4 border-b-4 border-slate-50 pb-4">
                             <div>
                                 <p class="font-black text-slate-800 text-base font-mono tracking-tighter">#${String(sale.id).slice(-6)}</p>
@@ -537,6 +580,14 @@
             lucide.createIcons();
         }
 
+        function clearFilters() {
+            document.getElementById('filterStartDate').value = '';
+            document.getElementById('filterEndDate').value = '';
+            document.getElementById('filterMethod').value = 'All';
+            renderReports();
+        }
+
+        // --- ANALYTICS ---
         function updateDashboard() {
             const today = new Date().toLocaleDateString();
             const todaySales = salesHistory.filter(s => s.date.includes(today));
