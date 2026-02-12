@@ -93,46 +93,54 @@
                     </span>
                     <button onclick="clearCart()" class="text-xs font-black text-red-500 border-2 border-red-100 px-4 py-2 rounded-xl bg-white active-press uppercase tracking-wider">RESET</button>
                 </div>
+
+                <!-- Active Items List -->
                 <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50"></div>
 
-                <div class="mt-auto p-5 md:p-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-5 gap-4">
+                <!-- COMPACT BILLING SUMMARY SECTION - INCREASED PADDING -->
+                <div class="mt-auto p-5 pb-16 md:p-8 md:pb-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-4">
                         <div class="flex flex-col">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Grand Total</span>
-                            <span class="text-3xl font-black text-amber-500 font-mono tracking-tighter leading-none" id="posGrandTotal">₹0.00</span>
+                            <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Grand Total</span>
+                            <span class="text-2xl font-black text-amber-500 font-mono tracking-tighter leading-none" id="posGrandTotal">₹0.00</span>
                         </div>
                         <div class="w-full sm:w-auto text-right">
-                            <div class="flex items-center gap-3 mb-2 justify-end">
-                                <span class="text-xs font-bold text-slate-400 uppercase tracking-tighter">Discount:</span>
-                                <input type="number" id="posDiscount" oninput="updatePosTotals()" value="0" class="w-20 bg-slate-800 border-2 border-slate-700 rounded-xl text-center text-base font-mono text-amber-400 py-1.5 outline-none focus:border-amber-500">
+                            <div class="flex items-center gap-2 mb-1 justify-end">
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Discount:</span>
+                                <input type="number" id="posDiscount" oninput="updatePosTotals()" value="0" class="w-16 bg-slate-800 border-2 border-slate-700 rounded-lg text-center text-sm font-mono text-amber-400 py-1 outline-none focus:border-amber-500">
                             </div>
-                            <span class="text-xs font-mono opacity-50 block" id="posSubtotal">Subtotal: ₹0.00</span>
+                            <span class="text-[10px] font-mono opacity-50 block" id="posSubtotal">Subtotal: ₹0.00</span>
                         </div>
                     </div>
 
-                    <div class="flex gap-4 mb-5">
-                        <button onclick="setPosPayment('Cash')" id="posPayCash" class="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest">
-                            <i data-lucide="banknote" class="w-6 h-6"></i> CASH
+                    <!-- Payment Mode Toggles -->
+                    <div class="flex gap-3 mb-4">
+                        <button onclick="setPosPayment('Cash')" id="posPayCash" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-[10px] active-press transition-all shadow-lg uppercase tracking-widest">
+                            <i data-lucide="banknote" class="w-4 h-4"></i> CASH
                         </button>
-                        <button onclick="setPosPayment('UPI')" id="posPayUPI" class="flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-xs active-press transition-all uppercase tracking-widest">
-                            <i data-lucide="qr-code" class="w-6 h-6"></i> UPI
+                        <button onclick="setPosPayment('UPI')" id="posPayUPI" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest">
+                            <i data-lucide="qr-code" class="w-4 h-4"></i> UPI
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-6">
-                        <div class="bg-slate-800/80 rounded-2xl p-4 flex flex-col border-2 border-white/5">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Received</span>
-                            <input type="number" id="posReceived" oninput="updatePosTotals()" placeholder="0" class="bg-transparent border-none p-0 text-white font-mono font-bold text-2xl outline-none w-full">
+                    <!-- Money Register -->
+                    <div class="grid grid-cols-2 gap-3 mb-5">
+                        <div class="bg-slate-800/80 rounded-xl p-3 flex flex-col border-2 border-white/5">
+                            <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Received</span>
+                            <input type="number" id="posReceived" oninput="updatePosTotals()" placeholder="0" class="bg-transparent border-none p-0 text-white font-mono font-bold text-xl outline-none w-full">
                         </div>
-                        <div class="bg-slate-800/80 rounded-2xl p-4 flex flex-col border-2 border-white/5">
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Change</span>
-                            <span id="posChange" class="text-2xl font-black text-green-400 font-mono leading-none py-1.5">₹0.00</span>
+                        <div class="bg-slate-800/80 rounded-xl p-3 flex flex-col border-2 border-white/5">
+                            <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Change</span>
+                            <span id="posChange" class="text-xl font-black text-green-400 font-mono leading-none py-1">₹0.00</span>
                         </div>
                     </div>
 
-                    <button onclick="processCheckout()" class="w-full bg-amber-500 text-slate-900 font-black py-5 rounded-[2rem] shadow-2xl active-press transition-all text-base tracking-[0.2em] uppercase mb-4">
+                    <!-- FINAL BUTTON - ADDED MARGIN BOTTOM -->
+                    <button onclick="processCheckout()" class="w-full bg-amber-500 text-slate-900 font-black py-4 rounded-2xl shadow-2xl active-press transition-all text-sm tracking-[0.1em] uppercase mb-6">
                         FINALIZE ORDER
                     </button>
+                    <!-- LARGER SPACER FOR MOBILE KEYBOARD/UI CLEARANCE -->
+                    <div class="h-20 md:hidden"></div>
                 </div>
             </div>
         </section>
@@ -162,7 +170,7 @@
         <!-- INVENTORY VIEW -->
         <section id="view-inventory" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Inventory</h1>
+                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Inventory Master</h1>
                 <button onclick="openItemModal()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
                     <i data-lucide="plus" class="w-6 h-6"></i> Add Product
                 </button>
@@ -179,9 +187,8 @@
                 </button>
             </div>
 
-            <!-- UPDATED FILTERS SECTION WITH START AND END DATE -->
             <div class="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-sm mb-6 space-y-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Advanced Filtering</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Range Filtering</p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Start Date</label>
@@ -192,7 +199,7 @@
                         <input type="date" id="filterEndDate" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Payment Method</label>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Payment Type</label>
                         <select id="filterMethod" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
                             <option value="All">All Methods</option>
                             <option value="Cash">Cash Only</option>
@@ -200,19 +207,19 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="clearFilters()" class="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest py-2 hover:text-red-500 transition-colors">Clear All Filters</button>
+                <button onclick="clearFilters()" class="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest py-2 hover:text-red-500 transition-colors">Reset Filters</button>
             </div>
 
             <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-100 mb-4 flex justify-between items-center shadow-sm">
-                <span class="text-xs font-black text-amber-700 uppercase tracking-widest">Filtered Result Total:</span>
-                <span class="text-2xl font-black text-amber-800 font-mono" id="reports-total">₹0.00</span>
+                <span class="text-xs font-black text-amber-700 uppercase tracking-widest">Total Revenue (Filtered):</span>
+                <span class="text-xl font-black text-amber-800 font-mono" id="reports-total">₹0.00</span>
             </div>
 
             <div id="reportsContainer" class="space-y-4 pb-28"></div>
         </section>
     </main>
 
-    <!-- MODALS -->
+    <!-- MODALS (PRODUCT ENTRY, ITEM MASTER, SUCCESS) -->
     <div id="posEntryModal" class="hidden fixed inset-0 z-[100] flex items-start justify-center bg-slate-900/80 backdrop-blur-md p-4 pt-16 md:items-center">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in slide-in-from-top-10 duration-300">
             <div class="bg-slate-900 p-6 text-white border-b-8 border-amber-500/20">
@@ -237,7 +244,7 @@
                     <p class="text-xs font-black text-amber-700 uppercase tracking-widest mb-1">Calculated Total</p>
                     <p id="posConversionResult" class="text-4xl font-black text-amber-600 font-mono tracking-tighter">₹0.00</p>
                 </div>
-                <button onclick="addItemToCartFromModal()" class="w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] active-press uppercase text-base tracking-[0.1em] shadow-2xl">ADD TO BILL</button>
+                <button onclick="addItemToCartFromModal()" class="w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] active-press uppercase text-base tracking-[0.1em] shadow-2xl shadow-slate-900/30">ADD TO BILL</button>
             </div>
         </div>
     </div>
@@ -275,7 +282,7 @@
     </div>
 
     <script>
-        // --- DATA & STATE ---
+        // --- CORE DATA & STATE ---
         let items = [
             { id: 1, name: 'Coconut Oil', price: 280 },
             { id: 2, name: 'Groundnut Oil', price: 190 },
@@ -309,6 +316,7 @@
         function switchView(viewId) {
             document.querySelectorAll('main > section').forEach(s => s.classList.add('hidden'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            
             document.querySelectorAll('nav button').forEach(btn => {
                 btn.className = "p-2.5 rounded-xl text-slate-400 hover:bg-slate-800 active-press";
             });
@@ -508,7 +516,6 @@
             const total = Math.max(0, subtotal - (parseFloat(document.getElementById('posDiscount').value) || 0));
             const received = parseFloat(document.getElementById('posReceived').value) || total;
             const change = Math.max(0, received - total);
-
             const sale = { id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total, method: paymentMethod, received, change };
             salesHistory.unshift(sale);
             localStorage.setItem('om_sales', JSON.stringify(salesHistory));
@@ -524,43 +531,30 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- UPDATED REPORTS & RANGE FILTER LOGIC ---
         function renderReports() {
             const container = document.getElementById('reportsContainer');
             if(!container) return;
-
             const startStr = document.getElementById('filterStartDate').value;
             const endStr = document.getElementById('filterEndDate').value;
             const methodFilter = document.getElementById('filterMethod').value;
-
-            // Prepare comparison objects
             let startDate = startStr ? new Date(startStr) : null;
             if(startDate) startDate.setHours(0, 0, 0, 0);
-
             let endDate = endStr ? new Date(endStr) : null;
-            if(endDate) endDate.setHours(23, 59, 59, 999); // Include entire end day
-
+            if(endDate) endDate.setHours(23, 59, 59, 999);
             const filteredHistory = salesHistory.filter(sale => {
                 const saleDateObj = new Date(sale.id);
-
-                // Date Range Check
                 if (startDate && saleDateObj < startDate) return false;
                 if (endDate && saleDateObj > endDate) return false;
-
-                // Payment Method Check
                 if (methodFilter !== 'All' && sale.method !== methodFilter) return false;
-
                 return true;
             });
-
             const filteredTotal = filteredHistory.reduce((sum, s) => sum + s.total, 0);
             document.getElementById('reports-total').innerText = `₹${filteredTotal.toLocaleString()}`;
-
             if (filteredHistory.length === 0) {
-                container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4"></i>No matches found</div>`;
+                container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4"></i>No matches</div>`;
             } else {
                 container.innerHTML = filteredHistory.map(sale => `
-                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm active-press transition-all">
+                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
                         <div class="flex justify-between items-start mb-4 border-b-4 border-slate-50 pb-4">
                             <div>
                                 <p class="font-black text-slate-800 text-base font-mono tracking-tighter">#${String(sale.id).slice(-6)}</p>
@@ -587,7 +581,6 @@
             renderReports();
         }
 
-        // --- ANALYTICS ---
         function updateDashboard() {
             const today = new Date().toLocaleDateString();
             const todaySales = salesHistory.filter(s => s.date.includes(today));
