@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
         
@@ -46,7 +47,6 @@
         }
         .cart-update { animation: pop 0.2s ease-out; }
 
-        /* Ensure inputs don't zoom on iOS */
         input, select, textarea { font-size: 16px !important; }
     </style>
 </head>
@@ -76,16 +76,14 @@
         
         <!-- POS VIEW -->
         <section id="view-pos" class="h-full overflow-y-auto custom-scrollbar flex flex-col md:flex-row bg-slate-50">
-            <!-- PRODUCT SELECTION -->
             <div class="w-full md:flex-[1.2] flex flex-col p-3 md:p-6 md:border-r-4 border-slate-200 shrink-0 md:h-full md:overflow-y-auto custom-scrollbar">
                 <div class="relative mb-4">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
-                    <input type="text" id="posSearch" placeholder="Search product..." oninput="renderPosGrid()" class="w-full pl-11 pr-4 py-3.5 bg-white border-4 border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none text-base font-bold transition-all shadow-sm">
+                    <input type="text" id="posSearch" placeholder="Search oil..." oninput="renderPosGrid()" class="w-full pl-11 pr-4 py-3.5 bg-white border-4 border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none text-base font-bold transition-all shadow-sm">
                 </div>
                 <div id="posGrid" class="pos-grid pb-6"></div>
             </div>
 
-            <!-- CART SECTION -->
             <div class="w-full flex-1 flex flex-col bg-white shrink-0 md:h-full md:overflow-y-auto custom-scrollbar border-t-4 md:border-t-0 border-slate-200">
                 <div class="px-5 py-4 border-b-4 border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10">
                     <span class="font-extrabold text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
@@ -93,9 +91,9 @@
                     </span>
                     <button onclick="clearCart()" class="text-xs font-black text-red-500 border-2 border-red-100 px-4 py-2 rounded-xl bg-white active-press uppercase tracking-wider">RESET</button>
                 </div>
+
                 <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50"></div>
 
-                <!-- COMPACT BILLING SUMMARY SECTION -->
                 <div class="mt-auto p-5 pb-16 md:p-8 md:pb-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-4">
                         <div class="flex flex-col">
@@ -115,7 +113,7 @@
                         <button onclick="setPosPayment('Cash')" id="posPayCash" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-[10px] active-press transition-all shadow-lg uppercase tracking-widest">
                             <i data-lucide="banknote" class="w-4 h-4"></i> CASH
                         </button>
-                        <button onclick="setPosPayment('UPI')" id="nav-upi" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest">
+                        <button onclick="setPosPayment('UPI')" id="posPayUPI" class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest">
                             <i data-lucide="qr-code" class="w-4 h-4"></i> UPI
                         </button>
                     </div>
@@ -139,29 +137,75 @@
             </div>
         </section>
 
-        <!-- DASHBOARD VIEW -->
-        <section id="view-dashboard" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
-            <h1 class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Stats Center</h1>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Revenue Today</p>
-                    <h3 class="text-3xl font-black text-slate-800 font-mono" id="dash-revenue">₹0.00</h3>
+        <!-- DASHBOARD (STATS CENTER) -->
+        <section id="view-dashboard" class="hidden h-full overflow-y-auto custom-scrollbar p-5 pb-24">
+            <h1 class="text-2xl font-black text-slate-800 mb-6 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Business Analytics</h1>
+            
+            <div class="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-sm mb-6 space-y-4">
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Date Range Filter</p>
+                    <button onclick="resetDashFilters()" class="text-[9px] font-black text-amber-600 uppercase border-b-2 border-amber-600 active:text-amber-700">Clear All Filters (Lifetime)</button>
                 </div>
-                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Transactions Today</p>
-                    <h3 class="text-3xl font-black text-slate-800 font-mono" id="dash-txns">0</h3>
-                </div>
-                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Daily Peak Product</p>
-                    <h3 class="text-xl font-black text-amber-600 uppercase truncate" id="dash-top">---</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">From</label>
+                        <input type="date" id="dashStartDate" onchange="updateDashboard()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">To</label>
+                        <input type="date" id="dashEndDate" onchange="updateDashboard()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
+                    </div>
                 </div>
             </div>
-            
-            <!-- NEW PIE CHART SECTION -->
-            <div class="bg-white p-6 rounded-[2.5rem] border-4 border-slate-100 shadow-sm flex flex-col items-center">
-                <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 text-center">Oil Sales Distribution (Today's KG %)</h2>
-                <div class="w-full max-w-[350px] aspect-square flex items-center justify-center">
-                    <canvas id="salesPieChart"></canvas>
+
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-[2rem] border-4 border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Revenue</p>
+                    <h3 class="text-2xl font-black text-slate-800 font-mono" id="dash-revenue">₹0.00</h3>
+                </div>
+                <div class="bg-white p-4 rounded-[2rem] border-4 border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Bills</p>
+                    <h3 class="text-2xl font-black text-slate-800 font-mono" id="dash-txns">0</h3>
+                </div>
+                <div class="bg-white p-4 rounded-[2rem] border-4 border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Avg Bill</p>
+                    <h3 class="text-2xl font-black text-blue-600 font-mono" id="dash-avg-bill">₹0</h3>
+                </div>
+                <div class="bg-white p-4 rounded-[2rem] border-4 border-slate-100 shadow-sm">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total KG Sold</p>
+                    <h3 class="text-2xl font-black text-green-600 font-mono" id="dash-total-kg">0 kg</h3>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-[2rem] p-6 mb-6 text-white border-4 border-amber-500/20">
+                <div class="flex items-center gap-3 mb-4">
+                    <i data-lucide="zap" class="text-amber-500"></i>
+                    <h2 class="text-sm font-black uppercase tracking-widest">Business Insights</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-semibold">
+                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                        <span class="text-slate-400">Peak Product:</span>
+                        <span id="dash-top" class="text-amber-400 uppercase tracking-tight">---</span>
+                    </div>
+                    <div class="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10">
+                        <span class="text-slate-400">Peak Payment:</span>
+                        <span id="insight-peak-payment" class="text-blue-400 uppercase tracking-tight">---</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+                <div class="bg-white p-6 rounded-[2.5rem] border-4 border-slate-100 shadow-sm">
+                    <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Revenue Contribution (₹)</h2>
+                    <div class="h-64 flex items-center justify-center">
+                        <canvas id="revenueBarChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-[2.5rem] border-4 border-slate-100 shadow-sm flex flex-col items-center overflow-visible">
+                    <h2 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-6 text-center">Weight Distribution (KG %)</h2>
+                    <div class="w-full max-w-[280px] aspect-square flex items-center justify-center relative">
+                        <canvas id="salesPieChart"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
@@ -169,25 +213,29 @@
         <!-- INVENTORY VIEW -->
         <section id="view-inventory" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Inventory Master</h1>
-                <button onclick="openItemModal()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
+                <h1 class="text-2xl font-black text-slate-800 uppercase border-l-8 border-amber-500 pl-4">Inventory</h1>
+                <button onclick="openItemModal()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase shadow-xl flex items-center justify-center gap-3">
                     <i data-lucide="plus" class="w-6 h-6"></i> Add Product
                 </button>
             </div>
             <div id="inventoryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-24"></div>
         </section>
 
-        <!-- REPORTS VIEW -->
+        <!-- REPORTS VIEW (REPAIRED FILTERS) -->
         <section id="view-reports" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h1 class="text-2xl font-black text-slate-800 uppercase tracking-tighter border-l-8 border-amber-500 pl-4">Sales History</h1>
-                <button onclick="exportToPDF()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase active-press shadow-xl flex items-center justify-center gap-3">
+                <h1 class="text-2xl font-black text-slate-800 uppercase border-l-8 border-amber-500 pl-4">Sales History</h1>
+                <button onclick="exportToPDF()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase shadow-xl flex items-center justify-center gap-3">
                     <i data-lucide="download" class="w-6 h-6"></i> Export PDF
                 </button>
             </div>
 
+            <!-- RESTORED FILTERS FOR REPORTS -->
             <div class="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-sm mb-6 space-y-4">
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Range Filtering</p>
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Range Filtering</p>
+                    <button onclick="clearFilters()" class="text-[9px] font-black text-red-500 uppercase border-b-2 border-red-500 active:text-red-700">Clear All Filters</button>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Start Date</label>
@@ -198,7 +246,7 @@
                         <input type="date" id="filterEndDate" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Payment Type</label>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase ml-1 mb-1">Payment Method</label>
                         <select id="filterMethod" onchange="renderReports()" class="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-amber-500 outline-none font-bold">
                             <option value="All">All Methods</option>
                             <option value="Cash">Cash Only</option>
@@ -206,11 +254,10 @@
                         </select>
                     </div>
                 </div>
-                <button onclick="clearFilters()" class="w-full text-[10px] font-black text-slate-400 uppercase tracking-widest py-2 hover:text-red-500 transition-colors">Reset Filters</button>
             </div>
 
             <div class="bg-amber-50 p-4 rounded-2xl border-2 border-amber-100 mb-4 flex justify-between items-center shadow-sm">
-                <span class="text-xs font-black text-amber-700 uppercase tracking-widest">Total Revenue (Filtered):</span>
+                <span class="text-xs font-black text-amber-700 uppercase tracking-widest">Total Sales Filtered:</span>
                 <span class="text-xl font-black text-amber-800 font-mono" id="reports-total">₹0.00</span>
             </div>
 
@@ -218,7 +265,6 @@
         </section>
     </main>
 
-    <!-- EXTREME BELOW FOOTER -->
     <footer class="bg-slate-900 text-slate-500 py-2 text-center text-[10px] font-bold uppercase tracking-widest shrink-0 border-t border-white/5">
         @Sri Mahamuni Oil mills
     </footer>
@@ -229,13 +275,13 @@
             <div class="bg-slate-900 p-6 text-white border-b-8 border-amber-500/20">
                 <div class="flex justify-between items-start mb-4">
                     <div class="min-w-0 pr-4">
-                        <h3 id="posItemName" class="text-2xl font-black uppercase tracking-tight truncate leading-tight">Oil Type</h3>
+                        <h3 id="posItemName" class="text-2xl font-black uppercase truncate leading-tight">Oil Type</h3>
                         <p id="posItemPriceDisplay" class="text-amber-400 text-sm font-bold tracking-[0.2em] mt-1 opacity-90 uppercase">₹0.00 / kg</p>
                     </div>
                     <button onclick="closeModal('posEntryModal')" class="p-2 text-white/30 active-press"><i data-lucide="x" class="w-8 h-8"></i></button>
                 </div>
                 <div class="relative">
-                    <input type="number" id="posValueInput" inputmode="decimal" placeholder="0.00" class="w-full bg-slate-800/50 text-white text-center text-7xl font-black py-8 rounded-[2rem] border-4 border-white/10 outline-none focus:ring-8 focus:ring-amber-500/20 focus:border-amber-500 font-mono">
+                    <input type="number" id="posValueInput" inputmode="decimal" placeholder="0.00" class="w-full bg-slate-800/50 text-white text-center text-7xl font-black py-8 rounded-[2rem] border-4 border-white/10 outline-none focus:border-amber-500 font-mono">
                     <p id="posModeIndicator" class="text-center text-amber-500/50 font-black uppercase tracking-[0.3em] text-[10px] mt-4">Enter Weight (KG)</p>
                 </div>
             </div>
@@ -245,10 +291,10 @@
                     <button onclick="togglePosMode('rs')" id="btnModeRS" class="flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400">BY AMOUNT</button>
                 </div>
                 <div class="bg-amber-50 rounded-2xl p-6 flex flex-col items-center border-4 border-amber-100">
-                    <p class="text-xs font-black text-amber-700 uppercase tracking-widest mb-1">Calculated Total</p>
+                    <p class="text-xs font-black text-amber-700 uppercase tracking-widest mb-1">Estimate</p>
                     <p id="posConversionResult" class="text-4xl font-black text-amber-600 font-mono tracking-tighter">₹0.00</p>
                 </div>
-                <button onclick="addItemToCartFromModal()" class="w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] active-press uppercase text-base tracking-[0.1em] shadow-2xl shadow-slate-900/30">ADD TO BILL</button>
+                <button onclick="addItemToCartFromModal()" class="w-full bg-slate-900 text-white font-black py-6 rounded-[1.5rem] uppercase text-base tracking-[0.1em] shadow-2xl">ADD TO BILL</button>
             </div>
         </div>
     </div>
@@ -260,28 +306,18 @@
                 <button onclick="closeModal('itemModal')" class="p-2 text-slate-300"><i data-lucide="x"></i></button>
             </div>
             <div class="p-8 space-y-5">
-                <input type="text" id="modalItemName" placeholder="Product Name" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold uppercase shadow-inner">
-                <input type="number" id="modalItemPrice" placeholder="Price per KG" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold font-mono shadow-inner">
-                <button onclick="handleItemSubmit()" class="w-full bg-amber-500 text-slate-900 font-black py-5 rounded-2xl active-press uppercase tracking-widest text-sm shadow-lg">SAVE PRODUCT</button>
+                <input type="text" id="modalItemName" placeholder="Product Name" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold uppercase">
+                <input type="number" id="modalItemPrice" placeholder="Price per KG" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold font-mono">
+                <button onclick="handleItemSubmit()" class="w-full bg-amber-500 text-slate-900 font-black py-5 rounded-2xl active-press uppercase text-sm shadow-lg">SAVE PRODUCT</button>
             </div>
         </div>
     </div>
 
     <div id="orderModal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
-        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm overflow-hidden p-8 flex flex-col items-center animate-in zoom-in duration-300">
+        <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-inner"><i data-lucide="check" class="w-10 h-10"></i></div>
-            <h3 class="text-2xl font-black text-slate-800 uppercase tracking-tighter mb-4 text-center">Payment Done</h3>
-            <div class="w-full bg-slate-50 rounded-[2rem] p-6 border-4 border-slate-100 receipt-font text-sm space-y-2 mb-8 shadow-inner overflow-y-auto max-h-48 no-scrollbar">
-                <div class="text-center border-b-2 border-dashed border-slate-300 pb-3 mb-3">
-                    <p class="font-black text-slate-800 uppercase text-lg">Mahamuni Oil Mills</p>
-                </div>
-                <div id="receiptItems"></div>
-                <div class="border-t-2 border-dashed border-slate-300 pt-4 mt-4 space-y-2 font-bold">
-                    <div class="flex justify-between text-slate-800 text-base"><span>TOTAL</span> <span id="receiptTotal">₹0.00</span></div>
-                    <div class="flex justify-between text-green-600 text-base"><span>CHANGE</span> <span id="receiptChange">₹0.00</span></div>
-                </div>
-            </div>
-            <button onclick="closeModal('orderModal')" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl text-base uppercase active-press tracking-[0.2em] shadow-xl">CONTINUE</button>
+            <h3 class="text-2xl font-black text-slate-800 uppercase mb-4 text-center">Payment Done</h3>
+            <button onclick="closeModal('orderModal')" class="w-full bg-slate-900 text-white font-black py-5 rounded-2xl text-base uppercase shadow-xl">CONTINUE</button>
         </div>
     </div>
 
@@ -301,7 +337,9 @@
         let currentPosItem = null;
         let posMode = 'kg';
         let currentEditId = null;
+        
         let pieChartInstance = null;
+        let barChartInstance = null;
 
         window.onload = () => {
             const storedItems = localStorage.getItem('om_items');
@@ -312,8 +350,9 @@
             renderPosGrid();
             renderInventory();
             renderReports();
-            updateDashboard();
-            initPieChart();
+            
+            initCharts();
+            updateDashboard(); // Lifetime by default
             lucide.createIcons();
         };
 
@@ -334,18 +373,19 @@
             lucide.createIcons();
         }
 
+        // --- INVENTORY MASTER ---
         function renderInventory() {
             const container = document.getElementById('inventoryContainer');
             if(!container) return;
             container.innerHTML = items.map(item => `
-                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center group">
+                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center">
                     <div class="flex-1 pr-4 min-w-0">
-                        <p class="font-extrabold text-slate-800 text-base uppercase truncate leading-none mb-1 tracking-tight">${item.name}</p>
+                        <p class="font-extrabold text-slate-800 text-base uppercase truncate leading-none mb-2 tracking-tight">${item.name}</p>
                         <p class="text-xs text-slate-400 font-mono font-black tracking-widest">₹${item.price.toFixed(2)} / KG</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="openItemModal(${item.id})" class="p-3 bg-amber-50 text-amber-600 rounded-2xl active-press border-2 border-amber-100/50"><i data-lucide="edit-3" class="w-6 h-6"></i></button>
-                        <button onclick="deleteItem(${item.id})" class="p-3 bg-red-50 text-red-600 rounded-2xl active-press border-2 border-red-100/50"><i data-lucide="trash-2" class="w-6 h-6"></i></button>
+                        <button onclick="openItemModal(${item.id})" class="p-3 bg-amber-50 text-amber-600 rounded-2xl active-press border-2 border-amber-100/50"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+                        <button onclick="deleteItem(${item.id})" class="p-3 bg-red-50 text-red-600 rounded-2xl active-press border-2 border-red-100/50"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -383,8 +423,6 @@
             closeModal('itemModal');
             renderInventory();
             renderPosGrid();
-            renderPosCart();
-            updatePosTotals();
         }
 
         function deleteItem(id) {
@@ -396,18 +434,19 @@
             }
         }
 
+        // --- POS ENGINE ---
         function renderPosGrid() {
             const search = document.getElementById('posSearch').value.toLowerCase();
             const grid = document.getElementById('posGrid');
             if(!grid) return;
             const filtered = items.filter(i => i.name.toLowerCase().includes(search));
             grid.innerHTML = filtered.map(item => `
-                <button onclick="openPosEntryModal(${item.id})" class="bg-white rounded-[2rem] border-4 border-slate-100 shadow-sm transition-all flex flex-col items-center justify-center text-center active-press aspect-square p-2 group hover:border-amber-400">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors shrink-0">
-                        <i data-lucide="droplets" class="w-6 h-6 md:w-7 md:h-7"></i>
+                <button onclick="openPosEntryModal(${item.id})" class="bg-white rounded-[2rem] border-4 border-slate-100 transition-all flex flex-col items-center justify-center text-center active-press aspect-square p-2 group hover:border-amber-400">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
+                        <i data-lucide="droplets" class="w-6 h-6"></i>
                     </div>
-                    <p class="font-extrabold text-slate-800 text-xs md:text-sm uppercase tracking-tighter leading-tight mb-1 line-clamp-2 px-1">${item.name}</p>
-                    <p class="text-[10px] md:text-xs font-black text-slate-400 font-mono">₹${item.price.toFixed(0)}</p>
+                    <p class="font-extrabold text-slate-800 text-xs uppercase mb-1 line-clamp-2">${item.name}</p>
+                    <p class="text-[10px] font-black text-slate-400 font-mono">₹${item.price.toFixed(0)}</p>
                 </button>
             `).join('');
             lucide.createIcons();
@@ -430,12 +469,9 @@
 
         function togglePosMode(mode) {
             posMode = mode;
-            const btnKG = document.getElementById('btnModeKG');
-            const btnRS = document.getElementById('btnModeRS');
-            const label = document.getElementById('posModeIndicator');
-            btnKG.className = mode === 'kg' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
-            btnRS.className = mode === 'rs' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
-            label.innerText = mode === 'kg' ? "Enter Weight (KG)" : "Enter Amount (₹)";
+            document.getElementById('btnModeKG').className = mode === 'kg' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
+            document.getElementById('btnModeRS').className = mode === 'rs' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
+            document.getElementById('posModeIndicator').innerText = mode === 'kg' ? "Enter Weight (KG)" : "Enter Amount (₹)";
             document.getElementById('posValueInput').oninput();
         }
 
@@ -458,13 +494,13 @@
             } else {
                 list.innerHTML = cart.map((item, idx) => `
                     <div class="bg-white p-5 rounded-[2rem] border-4 border-slate-100 flex justify-between items-center shadow-sm cart-update">
-                        <div class="flex-1 min-w-0 pr-4">
-                            <p class="font-extrabold text-slate-800 text-sm truncate uppercase tracking-tight leading-none mb-1">${item.name}</p>
+                        <div class="flex-1 pr-4 min-w-0">
+                            <p class="font-extrabold text-slate-800 text-sm uppercase truncate mb-1 tracking-tight leading-none">${item.name}</p>
                             <p class="text-xs text-slate-400 font-mono font-black">${item.qty.toFixed(3)} kg × ₹${item.unitPrice}</p>
                         </div>
                         <div class="text-right flex items-center gap-3">
                             <span class="font-black text-slate-900 font-mono text-lg">₹${item.total.toFixed(2)}</span>
-                            <button onclick="removeFromCart(${idx})" class="p-3 bg-red-50 text-red-400 rounded-xl active-press border-2 border-red-100/50"><i data-lucide="x" class="w-6 h-6"></i></button>
+                            <button onclick="removeFromCart(${idx})" class="p-3 bg-red-50 text-red-400 rounded-xl active-press border-2 border-red-100/50 transition-colors"><i data-lucide="x" class="w-6 h-6"></i></button>
                         </div>
                     </div>
                 `).join('');
@@ -478,27 +514,20 @@
             updatePosTotals();
         }
 
-        function clearCart() {
-            if(cart.length > 0 && confirm('Wipe current bill clean?')) {
-                cart = [];
-                document.getElementById('posDiscount').value = 0;
-                document.getElementById('posReceived').value = '';
-                renderPosCart();
-                updatePosTotals();
-            }
-        }
-
         function setPosPayment(method) {
             paymentMethod = method;
             const cash = document.getElementById('posPayCash');
-            const upi = document.getElementById('nav-upi');
-            // Using ID check to prevent breaking previous design
+            const upi = document.getElementById('posPayUPI');
+            
+            const activeClass = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-[10px] active-press transition-all shadow-xl uppercase tracking-widest";
+            const inactiveClass = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest";
+
             if (method === 'Cash') {
-                cash.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest";
-                if(upi) upi.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-xs active-press transition-all uppercase tracking-widest";
+                cash.className = activeClass;
+                if(upi) upi.className = inactiveClass;
             } else {
-                if(upi) upi.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-xs active-press transition-all shadow-xl shadow-amber-500/20 uppercase tracking-widest";
-                cash.className = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-xs active-press transition-all uppercase tracking-widest";
+                if(upi) upi.className = activeClass;
+                cash.className = inactiveClass;
             }
         }
 
@@ -519,12 +548,10 @@
             const total = Math.max(0, subtotal - (parseFloat(document.getElementById('posDiscount').value) || 0));
             const received = parseFloat(document.getElementById('posReceived').value) || total;
             const change = Math.max(0, received - total);
+
             const sale = { id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total, method: paymentMethod, received, change };
             salesHistory.unshift(sale);
             localStorage.setItem('om_sales', JSON.stringify(salesHistory));
-            document.getElementById('receiptTotal').innerText = `₹${total.toFixed(2)}`;
-            document.getElementById('receiptChange').innerText = `₹${change.toFixed(2)}`;
-            document.getElementById('receiptItems').innerHTML = cart.map(i => `<div class="flex justify-between uppercase text-xs"><span>${i.name} (${i.qty.toFixed(2)}kg)</span><span>${i.total.toFixed(2)}</span></div>`).join('');
             document.getElementById('orderModal').classList.remove('hidden');
             cart = [];
             document.getElementById('posDiscount').value = 0;
@@ -534,53 +561,86 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // --- DASHBOARD & PIE CHART ---
+        // --- DASHBOARD ANALYTICS ---
         function updateDashboard() {
-            const today = new Date().toLocaleDateString();
-            const todaySales = salesHistory.filter(s => s.date.includes(today));
-            const revenue = todaySales.reduce((sum, s) => sum + s.total, 0);
-            
-            document.getElementById('dash-revenue').innerText = `₹${revenue.toLocaleString()}`;
-            document.getElementById('dash-txns').innerText = todaySales.length;
+            const startStr = document.getElementById('dashStartDate').value;
+            const endStr = document.getElementById('dashEndDate').value;
 
-            const oilTotals = {};
-            todaySales.forEach(sale => {
+            let filteredSales;
+            // LIFETIME VIEW BY DEFAULT
+            if (!startStr && !endStr) {
+                filteredSales = salesHistory;
+            } else {
+                let startDate = startStr ? new Date(startStr) : new Date(0);
+                startDate.setHours(0, 0, 0, 0);
+                let endDate = endStr ? new Date(endStr) : new Date();
+                endDate.setHours(23, 59, 59, 999);
+
+                filteredSales = salesHistory.filter(sale => {
+                    const d = new Date(sale.id);
+                    return d >= startDate && d <= endDate;
+                });
+            }
+
+            const revenue = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const txns = filteredSales.length;
+            const avgBill = txns > 0 ? revenue / txns : 0;
+            
+            const oilWeight = {};
+            const oilRevenue = {};
+            const paymentMethods = { Cash: 0, UPI: 0 };
+            let totalWeightSold = 0;
+
+            filteredSales.forEach(sale => {
+                paymentMethods[sale.method] = (paymentMethods[sale.method] || 0) + 1;
                 sale.items.forEach(item => {
-                    oilTotals[item.name] = (oilTotals[item.name] || 0) + item.qty;
+                    oilWeight[item.name] = (oilWeight[item.name] || 0) + item.qty;
+                    oilRevenue[item.name] = (oilRevenue[item.name] || 0) + item.total;
+                    totalWeightSold += item.qty;
                 });
             });
 
-            if (todaySales.length > 0) {
-                const topProd = Object.keys(oilTotals).reduce((a, b) => oilTotals[a] > oilTotals[b] ? a : b);
-                document.getElementById('dash-top').innerText = topProd;
-            }
+            document.getElementById('dash-revenue').innerText = `₹${revenue.toLocaleString()}`;
+            document.getElementById('dash-txns').innerText = txns;
+            document.getElementById('dash-avg-bill').innerText = `₹${avgBill.toFixed(0)}`;
+            document.getElementById('dash-total-kg').innerText = `${totalWeightSold.toFixed(1)} kg`;
+
+            const topOil = Object.keys(oilWeight).length > 0 ? Object.keys(oilWeight).reduce((a, b) => oilWeight[a] > oilWeight[b] ? a : b) : '---';
+            document.getElementById('dash-top').innerText = topOil;
+            
+            const peakPay = txns > 0 ? (paymentMethods.UPI > paymentMethods.Cash ? 'UPI' : 'Cash') : '---';
+            document.getElementById('insight-peak-payment').innerText = peakPay;
 
             if (pieChartInstance) {
-                pieChartInstance.data.labels = Object.keys(oilTotals);
-                pieChartInstance.data.datasets[0].data = Object.values(oilTotals);
+                pieChartInstance.data.labels = Object.keys(oilWeight);
+                pieChartInstance.data.datasets[0].data = Object.values(oilWeight);
                 pieChartInstance.update();
+            }
+            if (barChartInstance) {
+                barChartInstance.data.labels = Object.keys(oilRevenue);
+                barChartInstance.data.datasets[0].data = Object.values(oilRevenue);
+                barChartInstance.update();
             }
         }
 
-        function initPieChart() {
-            const canvas = document.getElementById('salesPieChart');
-            if(!canvas) return;
-            
-            pieChartInstance = new Chart(canvas.getContext('2d'), {
+        function resetDashFilters() {
+            document.getElementById('dashStartDate').value = '';
+            document.getElementById('dashEndDate').value = '';
+            updateDashboard();
+        }
+
+        function initCharts() {
+            Chart.register(ChartDataLabels);
+
+            // Pie Chart - Weight Distribution
+            const pieCtx = document.getElementById('salesPieChart').getContext('2d');
+            pieChartInstance = new Chart(pieCtx, {
                 type: 'pie',
                 data: {
                     labels: [],
                     datasets: [{
                         data: [],
-                        backgroundColor: [
-                            '#f59e0b', // Amber
-                            '#0f172a', // Slate
-                            '#3b82f6', // Blue
-                            '#10b981', // Green
-                            '#ef4444', // Red
-                            '#8b5cf6', // Violet
-                            '#f43f5e'  // Rose
-                        ],
+                        backgroundColor: ['#f59e0b', '#0f172a', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6'],
                         borderWidth: 4,
                         borderColor: '#ffffff'
                     }]
@@ -588,55 +648,107 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: 40 },
                     plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                font: { size: 11, weight: 'bold' },
-                                padding: 20
+                        legend: { position: 'bottom', labels: { font: { size: 10, weight: 'bold' }, padding: 20 } },
+                        datalabels: {
+                            color: '#475569',
+                            font: { weight: '800', size: 12 },
+                            anchor: 'end',
+                            align: 'end',
+                            offset: 12,
+                            formatter: (value, ctx) => {
+                                let sum = 0;
+                                let dataArr = ctx.chart.data.datasets[0].data;
+                                dataArr.map(data => sum += data);
+                                if (sum === 0) return "";
+                                return (value * 100 / sum).toFixed(1) + "%";
                             }
+                        }
+                    }
+                }
+            });
+
+            // Bar Chart - Revenue
+            const barCtx = document.getElementById('revenueBarChart').getContext('2d');
+            barChartInstance = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [],
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false }, ticks: { display: false } },
+                        x: { grid: { display: false }, ticks: { font: { size: 10, weight: 'bold' } } }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'top',
+                            formatter: (val) => '₹' + Math.round(val),
+                            font: { size: 10, weight: 'bold' },
+                            color: '#64748b'
                         }
                     }
                 }
             });
         }
 
+        // --- REPORTS ---
         function renderReports() {
             const container = document.getElementById('reportsContainer');
             if(!container) return;
+
             const startStr = document.getElementById('filterStartDate').value;
             const endStr = document.getElementById('filterEndDate').value;
             const methodFilter = document.getElementById('filterMethod').value;
-            let startDate = startStr ? new Date(startStr) : null;
-            if(startDate) startDate.setHours(0, 0, 0, 0);
-            let endDate = endStr ? new Date(endStr) : null;
-            if(endDate) endDate.setHours(23, 59, 59, 999);
-            const filteredHistory = salesHistory.filter(sale => {
-                const saleDateObj = new Date(sale.id);
-                if (startDate && saleDateObj < startDate) return false;
-                if (endDate && saleDateObj > endDate) return false;
-                if (methodFilter !== 'All' && sale.method !== methodFilter) return false;
-                return true;
-            });
+
+            let filteredHistory;
+            if (!startStr && !endStr && methodFilter === 'All') {
+                filteredHistory = salesHistory;
+            } else {
+                let startDate = startStr ? new Date(startStr) : new Date(0);
+                startDate.setHours(0, 0, 0, 0);
+                let endDate = endStr ? new Date(endStr) : new Date();
+                endDate.setHours(23, 59, 59, 999);
+
+                filteredHistory = salesHistory.filter(sale => {
+                    const saleDateObj = new Date(sale.id);
+                    const dateMatch = saleDateObj >= startDate && saleDateObj <= endDate;
+                    const methodMatch = methodFilter === 'All' || sale.method === methodFilter;
+                    return dateMatch && methodMatch;
+                });
+            }
+
             const filteredTotal = filteredHistory.reduce((sum, s) => sum + s.total, 0);
             document.getElementById('reports-total').innerText = `₹${filteredTotal.toLocaleString()}`;
+
             if (filteredHistory.length === 0) {
                 container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4"></i>No matches</div>`;
             } else {
                 container.innerHTML = filteredHistory.map(sale => `
-                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm">
+                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm transition-all active-press">
                         <div class="flex justify-between items-start mb-4 border-b-4 border-slate-50 pb-4">
                             <div>
-                                <p class="font-black text-slate-800 text-sm leading-tight uppercase tracking-tight">${sale.date}</p>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Ref ID: #${String(sale.id).slice(-6)}</p>
+                                <p class="font-black text-slate-800 text-sm uppercase leading-tight tracking-tight">${sale.date}</p>
+                                <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Ref ID: #${String(sale.id).slice(-6)}</p>
                             </div>
                             <div class="text-right">
-                                <p class="font-black text-slate-900 font-mono text-xl leading-none">₹${sale.total.toFixed(2)}</p>
-                                <span class="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 border-slate-100 mt-2 inline-block text-amber-600">${sale.method}</span>
+                                <p class="font-black text-slate-900 font-mono text-xl">₹${sale.total.toFixed(2)}</p>
+                                <span class="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 border-slate-100 inline-block text-amber-600">${sale.method}</span>
                             </div>
                         </div>
                         <div class="space-y-2">
-                            ${sale.items.map(item => `<div class="flex justify-between items-center text-sm"><span class="text-slate-600 font-bold uppercase truncate pr-4">${item.name}</span><span class="text-slate-400 font-mono font-black shrink-0">${item.qty.toFixed(3)} kg</span></div>`).join('')}
+                            ${sale.items.map(item => `<div class="flex justify-between items-center text-sm"><span class="text-slate-600 font-bold uppercase truncate pr-4">${item.name}</span><span class="text-slate-400 font-mono font-black">${item.qty.toFixed(3)} kg</span></div>`).join('')}
                         </div>
                     </div>
                 `).join('');
@@ -652,14 +764,14 @@
         }
 
         function exportToPDF() {
-            if (!window.jspdf) return alert("Loading PDF...");
+            if (!window.jspdf) return alert("PDF Engine Loading...");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(22);
             doc.setTextColor(180, 83, 9);
-            doc.text("SRI MAHAMUNI OIL MILLS - SALES REPORT", 105, 20, { align: "center" });
-            const tableData = salesHistory.map(s => [s.date, `ID: #${String(s.id).slice(-6)}`, s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), s.method, `Rs. ${s.total.toFixed(2)}`]);
-            doc.autoTable({ startY: 35, head: [['Date', 'Ref ID', 'Items & Weight', 'Mode', 'Total']], body: tableData, theme: 'striped', headStyles: { fillColor: [180, 83, 9] } });
+            doc.text("MAHAMUNI OIL MILLS - SALES REPORT", 105, 20, { align: "center" });
+            const tableData = salesHistory.map(s => [s.date, `#${String(s.id).slice(-6)}`, s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), s.method, `Rs. ${s.total.toFixed(2)}`]);
+            doc.autoTable({ startY: 35, head: [['Date', 'Ref ID', 'Items', 'Mode', 'Total']], body: tableData, theme: 'striped', headStyles: { fillColor: [180, 83, 9] } });
             doc.save(`Sales_Report.pdf`);
         }
 
