@@ -20,7 +20,6 @@
             font-size: 16px; 
         }
 
-        /* Compact POS Grid */
         .pos-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
@@ -221,7 +220,7 @@
             <div id="inventoryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-24"></div>
         </section>
 
-        <!-- REPORTS VIEW (REPAIRED FILTERS) -->
+        <!-- REPORTS VIEW -->
         <section id="view-reports" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h1 class="text-2xl font-black text-slate-800 uppercase border-l-8 border-amber-500 pl-4">Sales History</h1>
@@ -230,7 +229,6 @@
                 </button>
             </div>
 
-            <!-- RESTORED FILTERS FOR REPORTS -->
             <div class="bg-white p-5 rounded-3xl border-4 border-slate-100 shadow-sm mb-6 space-y-4">
                 <div class="flex justify-between items-center mb-2">
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Range Filtering</p>
@@ -269,7 +267,23 @@
         @Sri Mahamuni Oil mills
     </footer>
 
-    <!-- MODAL: PRODUCT ENTRY (COMPACTED FOR MOBILE) -->
+    <!-- MODALS -->
+    
+    <!-- CONFIRMATION MODAL -->
+    <div id="confirmModal" class="hidden fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-6">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center animate-in zoom-in duration-200">
+            <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+                <i data-lucide="alert-triangle" class="w-10 h-10"></i>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 uppercase mb-2">Are you sure?</h3>
+            <p id="confirmText" class="text-slate-500 text-sm mb-8 px-4 font-semibold">This action cannot be undone.</p>
+            <div class="flex gap-4">
+                <button id="btnConfirmCancel" class="flex-1 bg-slate-100 text-slate-500 font-black py-4 rounded-2xl active-press uppercase text-xs tracking-widest">Cancel</button>
+                <button id="btnConfirmProceed" class="flex-1 bg-red-500 text-white font-black py-4 rounded-2xl active-press shadow-lg shadow-red-500/20 uppercase text-xs tracking-widest">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <div id="posEntryModal" class="hidden fixed inset-0 z-[100] flex items-start justify-center bg-slate-900/80 backdrop-blur-md p-4 pt-8 md:items-center">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in slide-in-from-top-10 duration-300">
             <div class="bg-slate-900 p-4 text-white border-b-4 border-amber-500/20">
@@ -299,7 +313,6 @@
         </div>
     </div>
 
-    <!-- ITEM MASTER MODAL -->
     <div id="itemModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
             <div class="p-6 border-b-4 border-slate-50 flex justify-between items-center">
@@ -314,7 +327,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL -->
     <div id="orderModal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
         <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-inner"><i data-lucide="check" class="w-10 h-10"></i></div>
@@ -354,7 +366,7 @@
             renderReports();
             
             initCharts();
-            updateDashboard(); // Lifetime by default
+            updateDashboard();
             lucide.createIcons();
         };
 
@@ -375,14 +387,36 @@
             lucide.createIcons();
         }
 
+        // --- CUSTOM CONFIRMATION MODAL LOGIC ---
+        function openConfirm(text, onProceed) {
+            const modal = document.getElementById('confirmModal');
+            document.getElementById('confirmText').innerText = text;
+            modal.classList.remove('hidden');
+            
+            const proceedBtn = document.getElementById('btnConfirmProceed');
+            const cancelBtn = document.getElementById('btnConfirmCancel');
+            
+            const cleanup = () => {
+                modal.classList.add('hidden');
+                proceedBtn.removeEventListener('click', handleProceed);
+                cancelBtn.removeEventListener('click', handleCancel);
+            };
+            
+            const handleProceed = () => { onProceed(); cleanup(); };
+            const handleCancel = () => { cleanup(); };
+            
+            proceedBtn.addEventListener('click', handleProceed);
+            cancelBtn.addEventListener('click', handleCancel);
+        }
+
         // --- INVENTORY MASTER ---
         function renderInventory() {
             const container = document.getElementById('inventoryContainer');
             if(!container) return;
             container.innerHTML = items.map(item => `
-                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center group">
+                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center">
                     <div class="flex-1 pr-4 min-w-0">
-                        <p class="font-extrabold text-slate-800 text-base uppercase truncate leading-none mb-1 tracking-tight">${item.name}</p>
+                        <p class="font-extrabold text-slate-800 text-base uppercase truncate leading-none mb-2 tracking-tight">${item.name}</p>
                         <p class="text-xs text-slate-400 font-mono font-black tracking-widest">₹${item.price.toFixed(2)} / KG</p>
                     </div>
                     <div class="flex gap-2">
@@ -428,12 +462,12 @@
         }
 
         function deleteItem(id) {
-            if (confirm('Delete this product?')) {
+            openConfirm('Are you sure you want to permanently remove this product from inventory?', () => {
                 items = items.filter(i => i.id !== id);
                 localStorage.setItem('om_items', JSON.stringify(items));
                 renderInventory();
                 renderPosGrid();
-            }
+            });
         }
 
         // --- POS ENGINE ---
@@ -517,12 +551,14 @@
         }
 
         function clearCart() {
-            if(cart.length > 0 && confirm('Wipe bill?')) {
-                cart = [];
-                document.getElementById('posDiscount').value = 0;
-                document.getElementById('posReceived').value = '';
-                renderPosCart();
-                updatePosTotals();
+            if(cart.length > 0) {
+                openConfirm('Clear all items currently in this bill?', () => {
+                    cart = [];
+                    document.getElementById('posDiscount').value = 0;
+                    document.getElementById('posReceived').value = '';
+                    renderPosCart();
+                    updatePosTotals();
+                });
             }
         }
 
@@ -536,9 +572,9 @@
 
             if (method === 'Cash') {
                 cash.className = activeClass;
-                if(upi) upi.className = inactiveClass;
+                upi.className = inactiveClass;
             } else {
-                if(upi) upi.className = activeClass;
+                upi.className = activeClass;
                 cash.className = inactiveClass;
             }
         }
@@ -602,7 +638,6 @@
             const endStr = document.getElementById('dashEndDate').value;
 
             let filteredSales;
-            // LIFETIME VIEW BY DEFAULT
             if (!startStr && !endStr) {
                 filteredSales = salesHistory;
             } else {
@@ -667,7 +702,6 @@
         function initCharts() {
             Chart.register(ChartDataLabels);
 
-            // Pie Chart - Weight Distribution
             const pieCtx = document.getElementById('salesPieChart').getContext('2d');
             pieChartInstance = new Chart(pieCtx, {
                 type: 'pie',
@@ -704,7 +738,6 @@
                 }
             });
 
-            // Bar Chart - Revenue
             const barCtx = document.getElementById('revenueBarChart').getContext('2d');
             barChartInstance = new Chart(barCtx, {
                 type: 'bar',
@@ -739,6 +772,15 @@
         }
 
         // --- REPORTS ---
+        function deleteSale(saleId) {
+            openConfirm('Delete this bill permanently? This will update your stats and cannot be undone.', () => {
+                salesHistory = salesHistory.filter(s => s.id !== saleId);
+                localStorage.setItem('om_sales', JSON.stringify(salesHistory));
+                renderReports();
+                updateDashboard();
+            });
+        }
+
         function renderReports() {
             const container = document.getElementById('reportsContainer');
             if(!container) return;
@@ -752,15 +794,20 @@
                 container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4"></i>No matches</div>`;
             } else {
                 container.innerHTML = filteredHistory.map(sale => `
-                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm transition-all active-press">
+                    <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm transition-all group">
                         <div class="flex justify-between items-start mb-4 border-b-4 border-slate-50 pb-4">
                             <div>
                                 <p class="font-black text-slate-800 text-sm uppercase leading-tight tracking-tight">${sale.date}</p>
                                 <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase">Ref ID: #${String(sale.id).slice(-6)}</p>
                             </div>
-                            <div class="text-right">
-                                <p class="font-black text-slate-900 font-mono text-xl">₹${sale.total.toFixed(2)}</p>
-                                <span class="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 border-slate-100 inline-block text-amber-600">${sale.method}</span>
+                            <div class="flex gap-4 items-start">
+                                <div class="text-right">
+                                    <p class="font-black text-slate-900 font-mono text-xl leading-none">₹${sale.total.toFixed(2)}</p>
+                                    <span class="text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full border-2 border-slate-100 inline-block text-amber-600 mt-2">${sale.method}</span>
+                                </div>
+                                <button onclick="deleteSale(${sale.id})" class="p-3 bg-red-50 text-red-500 rounded-2xl active-press border-2 border-red-100/50 transition-colors">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="space-y-2">
@@ -784,7 +831,6 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // Only export what is currently filtered
             const exportData = getFilteredHistory();
             
             doc.setFontSize(22);
@@ -828,4 +874,3 @@
     </script>
 </body>
 </html>
-
