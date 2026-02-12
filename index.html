@@ -384,8 +384,8 @@
                         <p class="text-xs text-slate-400 font-mono font-black tracking-widest">₹${item.price.toFixed(2)} / KG</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="openItemModal(${item.id})" class="p-3 bg-amber-50 text-amber-600 rounded-2xl active-press border-2 border-amber-100/50"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
-                        <button onclick="deleteItem(${item.id})" class="p-3 bg-red-50 text-red-600 rounded-2xl active-press border-2 border-red-100/50"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                        <button onclick="openItemModal(${item.id})" class="p-3 bg-amber-50 text-amber-600 rounded-2xl border-2 border-amber-100/50 active-press transition-colors"><i data-lucide="edit-3" class="w-5 h-5"></i></button>
+                        <button onclick="deleteItem(${item.id})" class="p-3 bg-red-50 text-red-600 rounded-2xl border-2 border-red-100/50 active-press transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
                     </div>
                 </div>
             `).join('');
@@ -441,8 +441,8 @@
             if(!grid) return;
             const filtered = items.filter(i => i.name.toLowerCase().includes(search));
             grid.innerHTML = filtered.map(item => `
-                <button onclick="openPosEntryModal(${item.id})" class="bg-white rounded-[2rem] border-4 border-slate-100 transition-all flex flex-col items-center justify-center text-center active-press aspect-square p-2 group hover:border-amber-400">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
+                <button onclick="openPosEntryModal(${item.id})" class="bg-white rounded-[2rem] border-4 border-slate-100 transition-all flex flex-col items-center justify-center text-center active-press aspect-square p-2 group hover:border-amber-400 shadow-sm">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors">
                         <i data-lucide="droplets" class="w-6 h-6"></i>
                     </div>
                     <p class="font-extrabold text-slate-800 text-xs uppercase mb-1 line-clamp-2">${item.name}</p>
@@ -559,6 +559,29 @@
             renderPosCart();
             updatePosTotals();
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Helper function for range filtering
+        function getFilteredHistory() {
+            const startStr = document.getElementById('filterStartDate').value;
+            const endStr = document.getElementById('filterEndDate').value;
+            const methodFilter = document.getElementById('filterMethod').value;
+
+            if (!startStr && !endStr && methodFilter === 'All') {
+                return salesHistory;
+            } else {
+                let startDate = startStr ? new Date(startStr) : new Date(0);
+                startDate.setHours(0, 0, 0, 0);
+                let endDate = endStr ? new Date(endStr) : new Date();
+                endDate.setHours(23, 59, 59, 999);
+
+                return salesHistory.filter(sale => {
+                    const saleDateObj = new Date(sale.id);
+                    const dateMatch = saleDateObj >= startDate && saleDateObj <= endDate;
+                    const methodMatch = methodFilter === 'All' || sale.method === methodFilter;
+                    return dateMatch && methodMatch;
+                });
+            }
         }
 
         // --- DASHBOARD ANALYTICS ---
@@ -708,26 +731,7 @@
             const container = document.getElementById('reportsContainer');
             if(!container) return;
 
-            const startStr = document.getElementById('filterStartDate').value;
-            const endStr = document.getElementById('filterEndDate').value;
-            const methodFilter = document.getElementById('filterMethod').value;
-
-            let filteredHistory;
-            if (!startStr && !endStr && methodFilter === 'All') {
-                filteredHistory = salesHistory;
-            } else {
-                let startDate = startStr ? new Date(startStr) : new Date(0);
-                startDate.setHours(0, 0, 0, 0);
-                let endDate = endStr ? new Date(endStr) : new Date();
-                endDate.setHours(23, 59, 59, 999);
-
-                filteredHistory = salesHistory.filter(sale => {
-                    const saleDateObj = new Date(sale.id);
-                    const dateMatch = saleDateObj >= startDate && saleDateObj <= endDate;
-                    const methodMatch = methodFilter === 'All' || sale.method === methodFilter;
-                    return dateMatch && methodMatch;
-                });
-            }
+            const filteredHistory = getFilteredHistory();
 
             const filteredTotal = filteredHistory.reduce((sum, s) => sum + s.total, 0);
             document.getElementById('reports-total').innerText = `₹${filteredTotal.toLocaleString()}`;
@@ -767,12 +771,45 @@
             if (!window.jspdf) return alert("PDF Engine Loading...");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            
+            // Only export what is currently filtered
+            const exportData = getFilteredHistory();
+            
             doc.setFontSize(22);
             doc.setTextColor(180, 83, 9);
             doc.text("MAHAMUNI OIL MILLS - SALES REPORT", 105, 20, { align: "center" });
-            const tableData = salesHistory.map(s => [s.date, `#${String(s.id).slice(-6)}`, s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), s.method, `Rs. ${s.total.toFixed(2)}`]);
-            doc.autoTable({ startY: 35, head: [['Date', 'Ref ID', 'Items', 'Mode', 'Total']], body: tableData, theme: 'striped', headStyles: { fillColor: [180, 83, 9] } });
-            doc.save(`Sales_Report.pdf`);
+            
+            const start = document.getElementById('filterStartDate').value;
+            const end = document.getElementById('filterEndDate').value;
+            if(start || end) {
+                doc.setFontSize(10);
+                doc.setTextColor(100);
+                doc.text(`Filtered: ${start || 'Lifetime'} to ${end || 'Present'}`, 105, 28, { align: "center" });
+            }
+
+            const tableData = exportData.map(s => [
+                s.date, 
+                `#${String(s.id).slice(-6)}`, 
+                s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), 
+                s.method, 
+                `Rs. ${s.total.toFixed(2)}`
+            ]);
+            
+            doc.autoTable({ 
+                startY: 35, 
+                head: [['Date', 'Ref ID', 'Items', 'Mode', 'Total']], 
+                body: tableData, 
+                theme: 'striped', 
+                headStyles: { fillColor: [180, 83, 9] } 
+            });
+            
+            const total = exportData.reduce((sum, s) => sum + s.total, 0);
+            const finalY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(14);
+            doc.setTextColor(0);
+            doc.text(`Total: Rs. ${total.toLocaleString()}`, 190, finalY, { align: "right" });
+
+            doc.save(`Sales_Report_${new Date().toLocaleDateString()}.pdf`);
         }
 
         function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
