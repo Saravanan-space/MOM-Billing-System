@@ -75,7 +75,6 @@
         
         <!-- POS VIEW -->
         <section id="view-pos" class="h-full overflow-y-auto custom-scrollbar flex flex-col md:flex-row bg-slate-50">
-            <!-- PRODUCT SELECTION -->
             <div class="w-full md:flex-[1.2] flex flex-col p-3 md:p-6 md:border-r-4 border-slate-200 shrink-0 md:h-full md:overflow-y-auto custom-scrollbar">
                 <div class="relative mb-4">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
@@ -84,7 +83,6 @@
                 <div id="posGrid" class="pos-grid pb-6"></div>
             </div>
 
-            <!-- CART SECTION -->
             <div class="w-full flex-1 flex flex-col bg-white shrink-0 md:h-full md:overflow-y-auto custom-scrollbar border-t-4 md:border-t-0 border-slate-200">
                 <div class="px-5 py-4 border-b-4 border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10">
                     <span class="font-extrabold text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
@@ -95,7 +93,6 @@
 
                 <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50"></div>
 
-                <!-- COMPACT BILLING SUMMARY SECTION -->
                 <div class="mt-auto p-5 pb-16 md:p-8 md:pb-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-4">
                         <div class="flex flex-col">
@@ -272,7 +269,6 @@
 
     <!-- MODALS -->
     
-    <!-- CONFIRMATION MODAL -->
     <div id="confirmModal" class="hidden fixed inset-0 z-[300] flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-6">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden p-8 text-center animate-in zoom-in duration-200">
             <div class="w-20 h-20 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
@@ -287,7 +283,6 @@
         </div>
     </div>
 
-    <!-- POS ENTRY MODAL (RESIZED & INPUT AT TOP) -->
     <div id="posEntryModal" class="hidden fixed inset-0 z-[100] flex items-start justify-center bg-slate-900/80 backdrop-blur-md p-4 pt-8 md:items-center">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in slide-in-from-top-10 duration-300">
             <div class="bg-slate-900 p-4 text-white border-b-4 border-amber-500/20">
@@ -317,7 +312,6 @@
         </div>
     </div>
 
-    <!-- ITEM MASTER MODAL -->
     <div id="itemModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
             <div class="p-6 border-b-4 border-slate-50 flex justify-between items-center">
@@ -332,7 +326,6 @@
         </div>
     </div>
 
-    <!-- SUCCESS MODAL -->
     <div id="orderModal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
         <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-inner"><i data-lucide="check" class="w-10 h-10"></i></div>
@@ -372,7 +365,7 @@
             renderReports();
             
             initCharts();
-            updateDashboard(); // Lifetime by default
+            updateDashboard(); 
             lucide.createIcons();
         };
 
@@ -393,34 +386,28 @@
             lucide.createIcons();
         }
 
-        // --- CUSTOM CONFIRMATION MODAL LOGIC ---
         function openConfirm(text, onProceed) {
             const modal = document.getElementById('confirmModal');
             document.getElementById('confirmText').innerText = text;
             modal.classList.remove('hidden');
-            
             const proceedBtn = document.getElementById('btnConfirmProceed');
             const cancelBtn = document.getElementById('btnConfirmCancel');
-            
             const cleanup = () => {
                 modal.classList.add('hidden');
                 proceedBtn.removeEventListener('click', handleProceed);
                 cancelBtn.removeEventListener('click', handleCancel);
             };
-            
             const handleProceed = () => { onProceed(); cleanup(); };
             const handleCancel = () => { cleanup(); };
-            
             proceedBtn.addEventListener('click', handleProceed);
             cancelBtn.addEventListener('click', handleCancel);
         }
 
-        // --- INVENTORY MASTER ---
         function renderInventory() {
             const container = document.getElementById('inventoryContainer');
             if(!container) return;
             container.innerHTML = items.map(item => `
-                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center">
+                <div class="bg-white p-6 rounded-[2rem] border-4 border-slate-100 shadow-sm flex justify-between items-center group">
                     <div class="flex-1 pr-4 min-w-0">
                         <p class="font-extrabold text-slate-800 text-base uppercase truncate leading-none mb-2 tracking-tight">${item.name}</p>
                         <p class="text-xs text-slate-400 font-mono font-black tracking-widest">₹${item.price.toFixed(2)} / KG</p>
@@ -476,7 +463,6 @@
             });
         }
 
-        // --- POS ENGINE ---
         function renderPosGrid() {
             const search = document.getElementById('posSearch').value.toLowerCase();
             const grid = document.getElementById('posGrid');
@@ -511,8 +497,8 @@
 
         function togglePosMode(mode) {
             posMode = mode;
-            document.getElementById('btnModeKG').className = mode === 'kg' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
-            document.getElementById('btnModeRS').className = mode === 'rs' ? "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-4 rounded-xl text-sm font-bold uppercase transition-all text-slate-400";
+            document.getElementById('btnModeKG').className = mode === 'kg' ? "flex-1 py-2.5 rounded-lg text-xs font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 rounded-lg text-xs font-bold uppercase transition-all text-slate-400";
+            document.getElementById('btnModeRS').className = mode === 'rs' ? "flex-1 py-2.5 rounded-lg text-xs font-bold uppercase transition-all bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 rounded-lg text-xs font-bold uppercase transition-all text-slate-400";
             document.getElementById('posModeIndicator').innerText = mode === 'kg' ? "Enter Weight (KG)" : "Enter Amount (₹)";
             document.getElementById('posValueInput').oninput();
         }
@@ -572,10 +558,8 @@
             paymentMethod = method;
             const cash = document.getElementById('posPayCash');
             const upi = document.getElementById('posPayUPI');
-            
             const activeClass = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-amber-500 bg-amber-500 text-slate-900 font-black text-[10px] active-press transition-all shadow-xl uppercase tracking-widest";
             const inactiveClass = "flex-1 flex items-center justify-center gap-3 py-4 rounded-2xl border-4 border-slate-700 bg-transparent text-slate-400 font-black text-[10px] active-press transition-all uppercase tracking-widest";
-
             if (method === 'Cash') {
                 cash.className = activeClass;
                 upi.className = inactiveClass;
@@ -602,7 +586,6 @@
             const total = Math.max(0, subtotal - (parseFloat(document.getElementById('posDiscount').value) || 0));
             const received = parseFloat(document.getElementById('posReceived').value) || total;
             const change = Math.max(0, received - total);
-
             const sale = { id: Date.now(), date: new Date().toLocaleString(), items: [...cart], total, method: paymentMethod, received, change };
             salesHistory.unshift(sale);
             localStorage.setItem('om_sales', JSON.stringify(salesHistory));
@@ -615,12 +598,10 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        // Helper function for range filtering
         function getFilteredHistory() {
             const startStr = document.getElementById('filterStartDate').value;
             const endStr = document.getElementById('filterEndDate').value;
             const methodFilter = document.getElementById('filterMethod').value;
-
             if (!startStr && !endStr && methodFilter === 'All') {
                 return salesHistory;
             } else {
@@ -628,7 +609,6 @@
                 startDate.setHours(0, 0, 0, 0);
                 let endDate = endStr ? new Date(endStr) : new Date();
                 endDate.setHours(23, 59, 59, 999);
-
                 return salesHistory.filter(sale => {
                     const saleDateObj = new Date(sale.id);
                     const dateMatch = saleDateObj >= startDate && saleDateObj <= endDate;
@@ -638,35 +618,24 @@
             }
         }
 
-        // --- DASHBOARD ANALYTICS ---
         function updateDashboard() {
             const startStr = document.getElementById('dashStartDate').value;
             const endStr = document.getElementById('dashEndDate').value;
-
-            let filteredSales;
-            if (!startStr && !endStr) {
-                filteredSales = salesHistory;
-            } else {
+            let filteredSales = (!startStr && !endStr) ? salesHistory : salesHistory.filter(sale => {
+                const d = new Date(sale.id);
                 let startDate = startStr ? new Date(startStr) : new Date(0);
                 startDate.setHours(0, 0, 0, 0);
                 let endDate = endStr ? new Date(endStr) : new Date();
                 endDate.setHours(23, 59, 59, 999);
-
-                filteredSales = salesHistory.filter(sale => {
-                    const d = new Date(sale.id);
-                    return d >= startDate && d <= endDate;
-                });
-            }
-
+                return d >= startDate && d <= endDate;
+            });
             const revenue = filteredSales.reduce((sum, s) => sum + s.total, 0);
             const txns = filteredSales.length;
             const avgBill = txns > 0 ? revenue / txns : 0;
-            
             const oilWeight = {};
             const oilRevenue = {};
             const paymentMethods = { Cash: 0, UPI: 0 };
             let totalWeightSold = 0;
-
             filteredSales.forEach(sale => {
                 paymentMethods[sale.method] = (paymentMethods[sale.method] || 0) + 1;
                 sale.items.forEach(item => {
@@ -675,18 +644,14 @@
                     totalWeightSold += item.qty;
                 });
             });
-
             document.getElementById('dash-revenue').innerText = `₹${revenue.toLocaleString()}`;
             document.getElementById('dash-txns').innerText = txns;
             document.getElementById('dash-avg-bill').innerText = `₹${avgBill.toFixed(0)}`;
             document.getElementById('dash-total-kg').innerText = `${totalWeightSold.toFixed(1)} kg`;
-
             const topOil = Object.keys(oilWeight).length > 0 ? Object.keys(oilWeight).reduce((a, b) => oilWeight[a] > oilWeight[b] ? a : b) : '---';
             document.getElementById('dash-top').innerText = topOil;
-            
             const peakPay = txns > 0 ? (paymentMethods.UPI > paymentMethods.Cash ? 'UPI' : 'Cash') : '---';
             document.getElementById('insight-peak-payment').innerText = peakPay;
-
             if (pieChartInstance) {
                 pieChartInstance.data.labels = Object.keys(oilWeight);
                 pieChartInstance.data.datasets[0].data = Object.values(oilWeight);
@@ -707,7 +672,6 @@
 
         function initCharts() {
             Chart.register(ChartDataLabels);
-
             const pieCtx = document.getElementById('salesPieChart').getContext('2d');
             pieChartInstance = new Chart(pieCtx, {
                 type: 'pie',
@@ -736,14 +700,12 @@
                                 let sum = 0;
                                 let dataArr = ctx.chart.data.datasets[0].data;
                                 dataArr.map(data => sum += data);
-                                if (sum === 0) return "";
-                                return (value * 100 / sum).toFixed(1) + "%";
+                                return sum === 0 ? "" : (value * 100 / sum).toFixed(1) + "%";
                             }
                         }
                     }
                 }
             });
-
             const barCtx = document.getElementById('revenueBarChart').getContext('2d');
             barChartInstance = new Chart(barCtx, {
                 type: 'bar',
@@ -777,7 +739,6 @@
             });
         }
 
-        // --- REPORTS ---
         function deleteSale(saleId) {
             openConfirm('Delete this bill permanently? This will update your stats and cannot be undone.', () => {
                 salesHistory = salesHistory.filter(s => s.id !== saleId);
@@ -790,12 +751,9 @@
         function renderReports() {
             const container = document.getElementById('reportsContainer');
             if(!container) return;
-
             const filteredHistory = getFilteredHistory();
-
             const filteredTotal = filteredHistory.reduce((sum, s) => sum + s.total, 0);
             document.getElementById('reports-total').innerText = `₹${filteredTotal.toLocaleString()}`;
-
             if (filteredHistory.length === 0) {
                 container.innerHTML = `<div class="bg-white p-12 rounded-[2.5rem] text-center opacity-20 text-xs font-black uppercase tracking-widest"><i data-lucide="search-x" class="w-16 h-16 mx-auto mb-4"></i>No matches</div>`;
             } else {
@@ -832,17 +790,15 @@
             renderReports();
         }
 
+        // UPDATED PDF EXPORT WITH QUANTITY AND PRICE DETAILS
         function exportToPDF() {
             if (!window.jspdf) return alert("PDF Engine Loading...");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
             const exportData = getFilteredHistory();
-            
             doc.setFontSize(22);
             doc.setTextColor(180, 83, 9);
             doc.text("MAHAMUNI OIL MILLS - SALES REPORT", 105, 20, { align: "center" });
-            
             const start = document.getElementById('filterStartDate').value;
             const end = document.getElementById('filterEndDate').value;
             if(start || end) {
@@ -850,29 +806,26 @@
                 doc.setTextColor(100);
                 doc.text(`Filtered: ${start || 'Lifetime'} to ${end || 'Present'}`, 105, 28, { align: "center" });
             }
-
             const tableData = exportData.map(s => [
                 s.date, 
                 `#${String(s.id).slice(-6)}`, 
-                s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg)`).join(', '), 
+                s.items.map(i => `${i.name} (${i.qty.toFixed(3)}kg @ Rs.${i.unitPrice})`).join('\n'), 
                 s.method, 
                 `Rs. ${s.total.toFixed(2)}`
             ]);
-            
             doc.autoTable({ 
                 startY: 35, 
-                head: [['Date', 'Ref ID', 'Items', 'Mode', 'Total']], 
+                head: [['Date', 'Ref ID', 'Items & Breakdown', 'Mode', 'Total']], 
                 body: tableData, 
                 theme: 'striped', 
-                headStyles: { fillColor: [180, 83, 9] } 
+                headStyles: { fillColor: [180, 83, 9] },
+                styles: { fontSize: 9 }
             });
-            
             const total = exportData.reduce((sum, s) => sum + s.total, 0);
             const finalY = doc.lastAutoTable.finalY + 15;
             doc.setFontSize(14);
             doc.setTextColor(0);
             doc.text(`Total: Rs. ${total.toLocaleString()}`, 190, finalY, { align: "right" });
-
             doc.save(`Sales_Report_${new Date().toLocaleDateString()}.pdf`);
         }
 
