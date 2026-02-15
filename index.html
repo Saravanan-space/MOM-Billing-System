@@ -75,14 +75,16 @@
         
         <!-- POS VIEW -->
         <section id="view-pos" class="h-full overflow-y-auto custom-scrollbar flex flex-col md:flex-row bg-slate-50">
+            <!-- PRODUCT SELECTION -->
             <div class="w-full md:flex-[1.2] flex flex-col p-3 md:p-6 md:border-r-4 border-slate-200 shrink-0 md:h-full md:overflow-y-auto custom-scrollbar">
                 <div class="relative mb-4">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
-                    <input type="text" id="posSearch" placeholder="Search oil..." oninput="renderPosGrid()" class="w-full pl-11 pr-4 py-3.5 bg-white border-4 border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none text-base font-bold transition-all shadow-sm">
+                    <input type="text" id="posSearch" placeholder="Search product..." oninput="renderPosGrid()" onkeydown="if(event.key === 'Enter') { const first = document.querySelector('#posGrid button'); if(first) first.click(); }" class="w-full pl-11 pr-4 py-3.5 bg-white border-4 border-slate-200 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 outline-none text-base font-bold transition-all shadow-sm">
                 </div>
                 <div id="posGrid" class="pos-grid pb-6"></div>
             </div>
 
+            <!-- CART SECTION -->
             <div class="w-full flex-1 flex flex-col bg-white shrink-0 md:h-full md:overflow-y-auto custom-scrollbar border-t-4 md:border-t-0 border-slate-200">
                 <div class="px-5 py-4 border-b-4 border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10">
                     <span class="font-extrabold text-slate-800 text-sm uppercase tracking-widest flex items-center gap-2">
@@ -93,6 +95,7 @@
 
                 <div id="posCartList" class="p-4 space-y-3 bg-slate-50/50"></div>
 
+                <!-- COMPACT BILLING SUMMARY SECTION -->
                 <div class="mt-auto p-5 pb-16 md:p-8 md:pb-8 bg-slate-900 text-white rounded-t-[3rem] shadow-[0_-10px_50px_rgba(0,0,0,0.3)] border-t-4 border-amber-500/20">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-4 gap-4">
                         <div class="flex flex-col">
@@ -102,7 +105,7 @@
                         <div class="w-full sm:w-auto text-right">
                             <div class="flex items-center gap-2 mb-1 justify-end">
                                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Discount:</span>
-                                <input type="number" id="posDiscount" oninput="updatePosTotals()" value="0" class="w-16 bg-slate-800 border-2 border-slate-700 rounded-lg text-center text-sm font-mono text-amber-400 py-1 outline-none focus:border-amber-500">
+                                <input type="number" id="posDiscount" oninput="updatePosTotals()" onkeydown="if(event.key === 'Enter') document.getElementById('posReceived').focus()" value="0" class="w-16 bg-slate-800 border-2 border-slate-700 rounded-lg text-center text-sm font-mono text-amber-400 py-1 outline-none focus:border-amber-500">
                             </div>
                             <span class="text-[10px] font-mono opacity-50 block" id="posSubtotal">Subtotal: ₹0.00</span>
                         </div>
@@ -120,7 +123,7 @@
                     <div class="grid grid-cols-2 gap-3 mb-5">
                         <div class="bg-slate-800/80 rounded-xl p-3 flex flex-col border-2 border-white/5">
                             <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Received</span>
-                            <input type="number" id="posReceived" oninput="updatePosTotals()" placeholder="0" class="bg-transparent border-none p-0 text-white font-mono font-bold text-xl outline-none w-full">
+                            <input type="number" id="posReceived" oninput="updatePosTotals()" onkeydown="if(event.key === 'Enter') processCheckout()" placeholder="0" class="bg-transparent border-none p-0 text-white font-mono font-bold text-xl outline-none w-full">
                         </div>
                         <div class="bg-slate-800/80 rounded-xl p-3 flex flex-col border-2 border-white/5">
                             <span class="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-0.5">Change</span>
@@ -212,7 +215,7 @@
         <!-- INVENTORY VIEW -->
         <section id="view-inventory" class="hidden h-full overflow-y-auto custom-scrollbar p-5">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h1 class="text-2xl font-black text-slate-800 uppercase border-l-8 border-amber-500 pl-4">Inventory</h1>
+                <h1 class="text-2xl font-black text-slate-800 uppercase border-l-8 border-amber-500 pl-4">Inventory Master</h1>
                 <button onclick="openItemModal()" class="w-full sm:w-auto bg-slate-900 text-white px-6 py-4 rounded-2xl font-bold text-sm uppercase shadow-xl flex items-center justify-center gap-3">
                     <i data-lucide="plus" class="w-6 h-6"></i> Add Product
                 </button>
@@ -284,6 +287,7 @@
         </div>
     </div>
 
+    <!-- POS ENTRY MODAL (RESIZED & INPUT AT TOP) -->
     <div id="posEntryModal" class="hidden fixed inset-0 z-[100] flex items-start justify-center bg-slate-900/80 backdrop-blur-md p-4 pt-8 md:items-center">
         <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in slide-in-from-top-10 duration-300">
             <div class="bg-slate-900 p-4 text-white border-b-4 border-amber-500/20">
@@ -295,7 +299,7 @@
                     <button onclick="closeModal('posEntryModal')" class="p-1.5 text-white/30 active-press"><i data-lucide="x" class="w-6 h-6"></i></button>
                 </div>
                 <div class="relative">
-                    <input type="number" id="posValueInput" inputmode="decimal" placeholder="0.00" class="w-full bg-slate-800/50 text-white text-center text-5xl font-black py-4 rounded-2xl border-2 border-white/10 outline-none focus:border-amber-500 font-mono">
+                    <input type="number" id="posValueInput" inputmode="decimal" placeholder="0.00" onkeydown="if(event.key === 'Enter') addItemToCartFromModal()" class="w-full bg-slate-800/50 text-white text-center text-5xl font-black py-4 rounded-2xl border-2 border-white/10 outline-none focus:border-amber-500 font-mono">
                     <p id="posModeIndicator" class="text-center text-amber-500/50 font-black uppercase tracking-[0.3em] text-[9px] mt-1.5">Enter Weight (KG)</p>
                 </div>
             </div>
@@ -313,6 +317,7 @@
         </div>
     </div>
 
+    <!-- ITEM MASTER MODAL -->
     <div id="itemModal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in duration-200">
             <div class="p-6 border-b-4 border-slate-50 flex justify-between items-center">
@@ -320,13 +325,14 @@
                 <button onclick="closeModal('itemModal')" class="p-2 text-slate-300"><i data-lucide="x"></i></button>
             </div>
             <div class="p-8 space-y-5">
-                <input type="text" id="modalItemName" placeholder="Product Name" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold uppercase">
-                <input type="number" id="modalItemPrice" placeholder="Price per KG" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold font-mono">
+                <input type="text" id="modalItemName" placeholder="Product Name" onkeydown="if(event.key === 'Enter') document.getElementById('modalItemPrice').focus()" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold uppercase">
+                <input type="number" id="modalItemPrice" placeholder="Price per KG" onkeydown="if(event.key === 'Enter') handleItemSubmit()" class="w-full px-6 py-5 bg-slate-50 rounded-2xl border-4 border-transparent focus:border-amber-500 outline-none text-lg font-bold font-mono">
                 <button onclick="handleItemSubmit()" class="w-full bg-amber-500 text-slate-900 font-black py-5 rounded-2xl active-press uppercase text-sm shadow-lg">SAVE PRODUCT</button>
             </div>
         </div>
     </div>
 
+    <!-- SUCCESS MODAL -->
     <div id="orderModal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-slate-900/90 backdrop-blur-md p-4">
         <div class="bg-white rounded-[3rem] shadow-2xl w-full max-w-sm p-8 flex flex-col items-center animate-in zoom-in duration-300">
             <div class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6 shadow-inner"><i data-lucide="check" class="w-10 h-10"></i></div>
@@ -366,7 +372,7 @@
             renderReports();
             
             initCharts();
-            updateDashboard();
+            updateDashboard(); // Lifetime by default
             lucide.createIcons();
         };
 
@@ -478,7 +484,7 @@
             const filtered = items.filter(i => i.name.toLowerCase().includes(search));
             grid.innerHTML = filtered.map(item => `
                 <button onclick="openPosEntryModal(${item.id})" class="bg-white rounded-[2rem] border-4 border-slate-100 transition-all flex flex-col items-center justify-center text-center active-press aspect-square p-2 group hover:border-amber-400 shadow-sm">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors">
+                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-2 group-hover:bg-amber-500 group-hover:text-white transition-colors shadow-sm">
                         <i data-lucide="droplets" class="w-6 h-6"></i>
                     </div>
                     <p class="font-extrabold text-slate-800 text-xs uppercase mb-1 line-clamp-2">${item.name}</p>
