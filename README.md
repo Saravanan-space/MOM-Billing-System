@@ -1,87 +1,161 @@
-Sri Mahamuni Oil Mills | Pro Billing & Analytics System
+# Sri Mahamuni Oil Mills | Pro Billing & Analytics System
 
-A modern, high-performance Point of Sale (POS) and Inventory Management System specifically designed for oil mill operations. This application provides a seamless transition from product selection to finalized billing with built-in business intelligence analytics.
+A modern, high-performance **Point of Sale (POS)** and **Inventory Management System** specifically designed for **oil mill operations**.  
+This application provides a seamless transition from **product selection to finalized billing** with built-in **business intelligence analytics**.
 
-🌟 Key Features
+---
 
-🛒 Dynamic POS Engine
+# 🌟 Key Features
 
-Dual Entry Mode: Switch instantly between "By Weight" (KG) and "By Amount" (₹).
+## 🛒 Dynamic POS Engine
 
-Responsive Controls: Full keyboard support. Press Enter to add items or finalize bills instantly on both PC and Mobile.
+**Dual Entry Mode**  
+Switch instantly between **"By Weight" (KG)** and **"By Amount" (₹)**.
 
-Smart Cart: Real-time calculation of subtotal, discounts, and change amount.
+**Responsive Controls**  
+Full keyboard support. Press **Enter** to add items or finalize bills instantly on both **PC and Mobile**.
 
-📊 Stats Center (Business Intelligence)
+**Smart Cart**  
+Real-time calculation of **subtotal, discounts, and change amount**.
 
-Lifetime & Custom Range Analytics: View data from all time or filter by specific dates.
+---
 
-KPI Dashboard: Track Total Revenue, Bill Count, Average Bill Value, and Total Volume (KG) sold.
+## 📊 Stats Center (Business Intelligence)
 
-Visual Insights:
+**Lifetime & Custom Range Analytics**  
+View data from **all time** or filter by **specific dates**.
 
-Revenue Bar Chart: Identify which products generate the most cash.
+**KPI Dashboard**
+Track:
 
-Weight Distribution Pie Chart: Real-time percentages of oil types moved, with high-visibility external labels.
+- Total Revenue
+- Bill Count
+- Average Bill Value
+- Total Volume (KG) Sold
 
-Peak Performance Tracking: Automatically identifies top-selling products and preferred payment methods.
+**Visual Insights**
 
-📋 Sales History & Reporting
+**Revenue Bar Chart**  
+Identify which products generate the most revenue.
 
-Filtered Export: Generate PDF reports that respect your active filters (Date & Payment Mode).
+**Weight Distribution Pie Chart**  
+Real-time percentage of oil types sold with **high-visibility external labels**.
 
-Detailed Breakdowns: PDF exports include Item name, Quantity (kg), and Unit Price on separate lines for clarity.
+**Peak Performance Tracking**  
+Automatically identifies:
 
-Management Tools: Ability to delete individual bills with a custom safety confirmation modal to keep records accurate.
+- Top-selling products
+- Preferred payment methods
 
-📦 Inventory Master
+---
 
-Full CRUD Support: Add, Edit, or Delete products from the central inventory.
+## 📋 Sales History & Reporting
 
-Real-time Sync: Changes in inventory prices reflect immediately in the POS selection grid.
+**Filtered Export**  
+Generate **PDF reports** based on active filters (**Date & Payment Mode**).
 
-🛠️ Tech Stack
+**Detailed Breakdowns**  
+PDF exports include:
 
-Frontend: HTML5, JavaScript (ES6+), Tailwind CSS
+- Item Name  
+- Quantity (kg)  
+- Unit Price  
 
-Icons: Lucide-React
+Each item appears on **separate lines for clarity**.
 
-Charts: Chart.js with Datalabels Plugin
+**Management Tools**
 
-PDF Generation: jsPDF & jsPDF-AutoTable
+- Delete individual bills
+- Custom safety confirmation modal to prevent mistakes
 
-Persistence: Browser LocalStorage for offline data management.
+---
 
-🚀 Getting Started
+## 📦 Inventory Master
 
-Clone the repository:
+**Full CRUD Support**
 
-git clone [https://github.com/your-username/mahamuni-oil-pos.git](https://github.com/your-username/mahamuni-oil-pos.git)
+- Add products
+- Edit products
+- Delete products
 
+**Real-time Sync**
 
-Open the project:
-Simply open index.html in any modern web browser (Chrome, Safari, Edge).
+Changes in **inventory prices** immediately reflect in the **POS product grid**.
 
-Usage:
+---
 
-Add your products in the Inventory tab.
+# 🛠️ Tech Stack
 
-Start billing in the POS tab.
+**Frontend**
 
-Track growth in the Dashboard.
+- HTML5
+- JavaScript (ES6+)
+- Tailwind CSS
 
-📱 Mobile Optimization
+**Icons**
 
-The system is built with a Mobile-First approach.
+- Lucide React
 
-Scrollable Flow: The POS view uses a natural vertical scroll for mobile, placing the total section at the bottom for easy reach.
+**Charts**
 
-Touch-Friendly: Large buttons and inputs designed for high-speed mobile operation in a busy retail environment.
+- Chart.js  
+- Chart.js Datalabels Plugin
 
-Safe Viewport: Bottom padding ensures "Finalize" buttons are never hidden by mobile browser navigation bars.
+**PDF Generation**
 
-📄 License
+- jsPDF
+- jsPDF-AutoTable
 
-Distributed under the MIT License. See LICENSE for more information.
+**Data Storage**
 
-Developed for Sri Mahamuni Oil Mills Pure. Healthy. Traditional.
+- Browser **LocalStorage** for **offline data persistence**
+
+---
+
+# 🚀 Getting Started
+
+## 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/your-username/mahamuni-oil-pos.git
+```
+
+## 2️⃣ Open the Project
+
+Simply open:
+
+```
+index.html
+```
+
+in any modern browser such as:
+
+- Chrome
+- Edge
+- Safari
+
+---
+
+## 3️⃣ Usage
+
+1. Add your products in the **Inventory** tab  
+2. Start billing in the **POS** tab  
+3. Track business performance in the **Dashboard**
+
+---
+
+# 📱 Mobile Optimization
+
+The system is built with a **Mobile-First approach**.
+
+### Scrollable Flow
+The POS interface uses a **vertical scroll layout**, keeping the **total section at the bottom** for easy access.
+
+### Touch-Friendly UI
+Large buttons and inputs designed for **fast billing in busy retail environments**.
+
+### Safe Viewport
+Extra bottom padding ensures **Finalize buttons are never hidden by mobile browser navigation bars**.
+
+---
+
