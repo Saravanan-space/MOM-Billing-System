@@ -1,6 +1,6 @@
 # Sri Mahamuni Oil Mills | Pro Billing & Analytics System
 
-A modern, high-performance **Point of Sale (POS)** and **Inventory Management System** specifically designed for **oil mill operations**.  
+A modern, high-performance **Point of Sale (POS)** and **Inventory Management System** specifically designed for **oil mill operation**.  
 This application provides a seamless transition from **product selection to finalized billing** with built-in **business intelligence analytics**.
 
 ---
