@@ -82,6 +82,17 @@ Each item appears on **separate lines for clarity**.
 
 Changes in **inventory prices** immediately reflect in the **POS product grid**.
 
+## ⚙️ Settings & Theme Customization
+
+**Dark & Light Mode Engine**  
+Seamlessly switch between high-contrast light mode and eye-friendly dark mode with persistent user preferences.
+
+**Mill Profile Configuration**  
+Customize store name, contact numbers, and bill headers across the application.
+
+**Data Backup & Restore**  
+Export complete business data (products, sales history, configurations) to JSON, import backups, or restore default product catalogs.
+
 ---
 
 # 🛠️ Tech Stack
